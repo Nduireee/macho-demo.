@@ -369,7 +369,7 @@ textarea{width:100%;resize:vertical;margin-top:8px}
   .bub{max-width:92%}
 }
 .client-nav{display:flex;gap:10px;align-items:center}
-@media (max-width:640px){
+@media (max-width:1023px){
   body.is-client{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   .client-nav{position:fixed;left:0;right:0;bottom:0;z-index:25;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--surface);border-top:3px solid var(--sign);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
   .client-nav .btn{flex-direction:column;gap:2px;min-height:60px;padding:6px 2px;border-width:0;font-size:.8rem;background:transparent;color:var(--ink)}
@@ -550,6 +550,138 @@ body.no-bar .foot{display:none}
 .calitem{display:flex;gap:10px;align-items:flex-start;text-align:left;font:inherit;color:var(--ink);background:var(--soft);border:0;border-left:5px solid var(--navy);border-radius:4px;padding:8px 10px;cursor:pointer;width:100%}
 .calitem.request{background:#FFF4CC;border-left-color:var(--sign)}
 .caltime{flex:none;font-weight:800;font-variant-numeric:tabular-nums;min-width:44px}
+.o5b{order:2}
+.pill.held{background:var(--soft);color:var(--navy);display:inline-flex;gap:4px;align-items:center}
+.payee{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:12px;border-radius:6px;background:var(--bg);font-size:.95rem}
+.rel{grid-template-columns:repeat(4,1fr)}
+.clockbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 12px;border-radius:8px;background:var(--bg)}
+
+/* ================= Design refresh: one system for every screen ================= */
+:root{
+  --r:8px; --sp1:8px; --sp2:12px; --sp3:16px; --sp4:24px; --sp5:32px;
+  --sign:#FFC107; --sign-ink:#101820; --focus:#1F5FD1;
+  --muted:#46525D; --line:#8A96A1; --line-soft:#CDD5DB;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101820; --surface:#1B2733; --ink:#F5F7FA; --muted:#BAC6D1; --line:#5A6B7C; --line-soft:#33465A;
+    --navy:#2F6AA8; --soft:#24374B; --ok:#5CCB91; --ok-bg:#163A2A; --bad:#FF8F80; --bad-bg:#45201C; --focus:#FFC107;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101820; --surface:#1B2733; --ink:#F5F7FA; --muted:#BAC6D1; --line:#5A6B7C; --line-soft:#33465A;
+  --navy:#2F6AA8; --soft:#24374B; --ok:#5CCB91; --ok-bg:#163A2A; --bad:#FF8F80; --bad-bg:#45201C; --focus:#FFC107;
+}
+/* Text scales with the browser’s text size and with zoom */
+html{font-size:100%}
+body{font-size:1.125rem;line-height:1.6}
+.small{font-size:1rem}
+.tiny{font-size:.875rem}
+/* Readable type: condensed type only for the logo, the signboard, big numbers and page titles */
+h1,h2,h3,h4{font-family:var(--body);letter-spacing:0}
+.hello,.title-sm{font-family:var(--head);font-weight:700;font-size:clamp(1.875rem,1.55rem + 1.1vw,2.25rem);line-height:1.15}
+.hello-sub{font-size:1.125rem;color:var(--muted);margin-top:6px}
+.card h2,.block h2,.review-side h2{font-family:var(--body);font-size:clamp(1.25rem,1.15rem + .4vw,1.5rem);font-weight:700;line-height:1.25}
+.next h2{font-size:clamp(1.3rem,1.2rem + .4vw,1.5rem)}
+.what-h,.sub-h,.modal-sub,.report h3{font-family:var(--body);font-size:clamp(1.25rem,1.15rem + .4vw,1.5rem);font-weight:700}
+.sheet > h2{font-family:var(--body);font-size:clamp(1.4rem,1.3rem + .5vw,1.75rem);font-weight:700}
+.job-title{font-family:var(--body);font-size:clamp(1.5rem,1.35rem + .6vw,1.875rem);font-weight:700}
+.band{font-family:var(--body);font-size:1.3rem;font-weight:700}
+.whatbtn strong{font-family:var(--body);font-size:1.25rem;font-weight:700}
+.person h2,.pbody h2,.pname{font-family:var(--body);font-size:1.3rem;font-weight:700;margin:0}
+.st-name{font-size:1.06rem}
+.board-head{letter-spacing:.03em}
+/* Controls: big enough to tap, clearly one shape */
+.btn{min-height:48px;border-radius:var(--r);font-size:1.05rem}
+.btn.small-btn{min-height:44px;font-size:1rem;padding:8px 14px}
+.btn.sign{color:var(--sign-ink)}
+.btn:hover{filter:brightness(1.06)}
+.chips button,.chips .chip-static{min-height:44px}
+.seg button,.tickrow button{min-height:52px}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.linkish{font-weight:700;text-decoration-thickness:2px}
+input,select,textarea{font-size:1.06rem !important}
+.req{font-weight:400;color:var(--muted);font-size:.9rem}
+/* Cards: one radius, one padding */
+.card,.block,.pcard,.whatbtn,.stage,.kpi,.sumcard,.opt,.langopt,.shot{border-radius:var(--r)}
+.card{padding:var(--sp4)}
+.pill{font-size:.9rem}
+/* Header: one tidy row; current page clearly marked */
+.top-inner{flex-wrap:nowrap;gap:var(--sp2)}
+.top-right{flex-wrap:nowrap;gap:var(--sp1)}
+.brand-tag{display:none}
+[aria-current="page"]{box-shadow:inset 0 -4px 0 var(--sign)}
+.lang-name{display:inline}
+.lang-code{display:none}
+@media (max-width:1100px){.lang-name{display:none}.lang-code{display:inline}}
+.proto{font-size:.95rem}
+/* Dashboard */
+.sumcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--sp2);margin-top:var(--sp4)}
+.sumcard{font:inherit;color:var(--ink);text-align:left;background:var(--surface);border:2px solid var(--line-soft);border-radius:var(--r);padding:var(--sp3);display:flex;flex-direction:column;gap:4px;min-height:96px}
+button.sumcard{cursor:pointer}
+button.sumcard:hover{border-color:var(--ink)}
+.sumcard strong{font-family:var(--head);font-weight:700;font-size:2.1rem;line-height:1}
+.sumcard span{font-size:1rem;color:var(--muted)}
+.sumcard.hot{border-color:var(--sign);border-width:3px}
+.actionbar{display:flex;align-items:center;gap:var(--sp3);flex-wrap:wrap;margin-top:var(--sp3);padding:var(--sp3) var(--sp4);border-radius:var(--r);background:var(--surface);border:3px solid var(--sign)}
+.actionbar strong{font-size:1.15rem}
+.newmsg{display:flex;align-items:center;gap:var(--sp2);flex-wrap:wrap;margin-top:var(--sp3);padding:var(--sp2) var(--sp3);border:2px solid var(--line-soft);border-radius:var(--r);background:var(--surface);font-weight:700;cursor:default}
+.newmsg-actions{margin-left:auto;display:flex;gap:var(--sp1)}
+.what-h{margin:var(--sp5) 0 var(--sp2)}
+.what{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.whatbtn{position:relative;padding:var(--sp3) var(--sp4) var(--sp3) var(--sp3);align-items:flex-start;min-height:0}
+.whatbtn .whaticon{width:48px;height:48px}
+.whatbtn .small{display:block;margin-top:4px;line-height:1.45}
+.whatgo{position:absolute;top:var(--sp2);right:var(--sp2);color:var(--muted)}
+.whatbtn:hover,.whatbtn:focus-visible{border-color:var(--sign)}
+.whatbtn:hover .whatgo{color:var(--ink)}
+.soonline{display:flex;align-items:center;gap:6px;margin-top:var(--sp2)}
+.projects{gap:var(--sp3);grid-template-columns:repeat(auto-fill,minmax(290px,1fr))}
+.pthumb{aspect-ratio:auto;height:140px;width:100%;object-fit:cover}
+.pbody{gap:6px;padding:var(--sp3)}
+.pbody .ptype{font-size:.95rem}
+.pbody .loc{font-size:1rem}
+.pfacts{display:grid;grid-template-columns:max-content 1fr;gap:6px var(--sp2);margin:6px 0 4px;font-size:1rem}
+.pfacts dt{color:var(--muted)}
+.pfacts dd{margin:0;font-weight:700}
+.schip{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:.98rem;line-height:1.3}
+.schip.action{color:var(--ink);background:var(--sign);color:var(--sign-ink);padding:2px 8px;border-radius:4px}
+.schip.ok{color:var(--ok)}
+.schip.info{color:var(--ink)}
+.closed{margin-top:var(--sp4)}
+/* Phones: nothing sideways, everything tappable */
+@media (max-width:640px){
+  .wrap{padding:20px 14px 64px}
+  .card{padding:var(--sp3)}
+  .actionbar .btn{width:100%}
+  .newmsg-actions{margin-left:0;width:100%}
+  .newmsg-actions .btn{flex:1}
+  .sumcards{grid-template-columns:1fr 1fr}
+  .sumcard strong{font-size:1.7rem}
+  .board-head{font-size:1.3rem}
+}
+@media (max-width:360px){
+  .sumcards{grid-template-columns:1fr}
+  .top-inner{padding:10px 12px}
+  .brand-name{font-size:1.6rem}
+}
+body{overflow-x:hidden}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto !important}}
+.client-nav{grid-template-columns:repeat(4,minmax(0,1fr)) !important}
+@media (max-width:1023px){
+  .client-nav .btn,.client-nav .btn.small-btn{padding:6px 2px;min-width:0;min-height:60px;font-size:.8rem;line-height:1.15;white-space:normal;text-align:center}
+  .client-nav [aria-current="page"]{box-shadow:inset 0 -4px 0 var(--sign)}
+}
+
+@media (max-width:1023px){ .client-nav .tr-label{display:block !important} body.is-client .toast{bottom:calc(96px + env(safe-area-inset-bottom,0px))} }
+@media (min-width:641px) and (max-width:1023px){ .client-nav{left:50%;transform:translateX(-50%);max-width:720px;border-radius:12px 12px 0 0} }
+.projects{grid-template-columns:repeat(auto-fill,minmax(min(290px,100%),1fr))}
+.people{grid-template-columns:repeat(auto-fill,minmax(min(310px,100%),1fr))}
+.what{grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr))}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr))}
+@media (max-width:420px){ .estats{grid-template-columns:1fr} .pstats{grid-template-columns:1fr 1fr} }
+.card.pcard{padding:0}
 
 .linkbox{min-width:min(520px,62vw)}
 .sync{font-weight:700;padding:2px 10px;border-radius:12px;background:rgba(255,255,255,.12)}
@@ -620,6 +752,8 @@ const ICONS = {
   chat:'<path d="M4 4h16v12H8l-4 4z"/>',
   mail:'<rect x="3" y="5" width="18" height="14" rx="1"/><path d="m3 7 9 6 9-6"/>',
   star:'<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/>',
+  bank:'<path d="M3 10 12 4l9 6M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18"/>',
+  fastfwd:'<path d="M4 6l7 6-7 6zM13 6l7 6-7 6z"/>',
   heart:'<path d="M12 20s-7-4.5-9-9a4.5 4.5 0 0 1 9-3 4.5 4.5 0 0 1 9 3c-2 4.5-9 9-9 9z"/>',
   list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
   briefcase:'<rect x="3" y="7" width="18" height="13" rx="1"/><path d="M8 7V4h8v3M3 12h18"/>',
@@ -882,7 +1016,7 @@ const ALLCOUNTIES = ["Makueni","Kajiado","Kiambu","Nairobi","Machakos","Nakuru",
 const initials = n => n.split(" ").map(w => w[0]).join("").slice(0, 2);
 const AVC = ["#1E3A5F","#7A3B2E","#1C7343","#5B3F8C","#8A5A00","#1F6F78","#9C2F55","#3D4F5C"];
 const avatar = (id, size) => `<span class="pav" data-notr style="background:${AVC[Object.keys(VERIFIERS).indexOf(id) % AVC.length]};${size ? `width:${size}px;height:${size}px;font-size:${size/2.6}px` : ""}">${initials(VERIFIERS[id].name)}</span>`;
-const STATUS = { disputed:"Report under review: payment paused", fixing:"Payment on hold: waiting for fixes", fixed:"Contractor says it’s fixed: book a re-check", released:"Paid", ready:"Report ready for you", review:"Being checked by our review desk", onsite:"Surveyor on site", booked:"Visit booked", upcoming:"Not started" };
+const STATUS = { releasing:"Payment being released", disputed:"Report under review: payment paused", fixing:"Payment on hold: waiting for fixes", fixed:"Contractor says it’s fixed: book a re-check", released:"Paid", ready:"Report ready for you", review:"Being checked by our review desk", onsite:"Surveyor on site", booked:"Visit booked", upcoming:"Not started" };
 const WEIGHTS = [0, .1726, .1488, .1905, .1786, .1607, .1488];
 const COUNTIES = ["Kajiado","Kiambu","Nairobi","Machakos","Nakuru","Nyeri","Murang’a","Kisumu","Mombasa","Uasin Gishu","Kakamega","Meru"];
 
@@ -984,6 +1118,14 @@ function seed(){
                         { at:"14 Oct 2026, 17:40", by:REVIEWER, outcome:"approved", note:"Good catch on the beam steel. Clear photos now." }];
     v3.quality = { photos:false, notes:true, time:true, checklist:true }; }
   st.needsFeed = true;
+  const PAYEES = { p1:["Mutua & Sons Builders Ltd","KCB","4521"], p2:["Kariuki Construction Ltd","Equity","7710"], p3:["Wambugu Builders","Co-operative Bank","3302"], p4:["Njoroge & Daughters Construction Ltd","NCBA","9055"], p5:["Daniel Saitoti","Stanbic","1180"], p6:["Skyline Homes Ltd","NCBA","6400"] };
+  const listFor = p => p.type === "land" ? LAND_STAGES : p.type === "home" ? HOME_STAGES : MILESTONES;
+  st.projects.forEach(p => { const mo = p.money = { funded:{}, releases:{}, payee:PAYEES[p.id] ? { name:PAYEES[p.id][0], bank:PAYEES[p.id][1], last4:PAYEES[p.id][2], verifiedAt:"Jan 2026" } : null };
+    listFor(p).forEach((m, i) => { const a = p.amounts[i]; if(!a) return;
+      if(p.paid[m.id]){ mo.funded[m.id] = { on:p.paid[m.id], ref:"MCH-" + p.id.toUpperCase() + "-" + m.id.toUpperCase(), via:"bank" };
+        mo.releases[m.id] = { status:"paid", requestedAt:p.paid[m.id], approvals:[REVIEWER, "Ruth Wambui"], paidAt:p.paid[m.id], bankRef:"FT" + payRef(p.id + m.id).slice(1, 10) }; } }); });
+  [["p1","m4","5 Nov 2026"],["p2","m2","1 Nov 2026"],["p5","l2","3 Nov 2026"]].forEach(([pid, mid, on]) => { const p = st.projects.find(x => x.id === pid); p.money.funded[mid] = { on, ref:"MCH-" + pid.toUpperCase() + "-" + mid.toUpperCase(), via:"bank" }; });
+  st.clockShift = 0;
   /* Something on the review desk from the start: one report waiting, one sent back */
   st.visits.push(pastVisit("p1","visit-60",3,"v7","11 Nov 2026",{d6:{na:true},d7:{na:true}},"Walls about chest height on three sides. The back wall is lower because the stone delivery was late.","",
     {type:"video", progress:60, status:"submitted", reviewedAt:null, reviewer:null, submittedAt:"11 Nov 2026, 17:20", checkedInAt:"11 Nov 2026, 16:40"}));
@@ -1003,7 +1145,7 @@ const ROOM0 = QS.get("room") || ((typeof window !== "undefined" && window.MACHO_
 /* Demo mode shows the blue prototype bar and lets you switch sides freely.
    On: inside Claude, with ?demo=1 in the link, or demoMode:true in MACHO_CONFIG. Off: people must sign in, and see only their own side. */
 const DEMO = !!((typeof window !== "undefined" && window.claude) || QS.get("demo") === "1" || QS.get("room") || (window.MACHO_CONFIG && window.MACHO_CONFIG.demoMode));
-const KEY = "macho-demo-v12" + (ROOM0 === "demo" ? "" : ":" + ROOM0);
+const KEY = "macho-demo-v13" + (ROOM0 === "demo" ? "" : ":" + ROOM0);
 const SESSKEY = "macho-session" + (ROOM0 === "demo" ? "" : ":" + ROOM0);
 let SESSION = (() => { try{ return JSON.parse(localStorage.getItem(SESSKEY)) || null; }catch(e){ return null; } })();
 function saveSession(){ try{ if(SESSION) localStorage.setItem(SESSKEY, JSON.stringify(SESSION)); else localStorage.removeItem(SESSKEY); }catch(e){} }
@@ -1104,6 +1246,7 @@ const onsiteVisit = (p, mid) => pVisits(p).filter(v => v.milestoneId === mid && 
 function mStatus(p, mid){
   if(p.paid[mid]) return "released";
   if(openCase(p, mid)) return "disputed";
+  { const r = relOf(p, mid); if(r && r.status !== "paid") return "releasing"; }
   const af = activeFix(p, mid); if(af) return af.status === "sent" ? "fixing" : "fixed";
   const v = onsiteVisit(p, mid);
   if(!v) return "upcoming";
@@ -1123,7 +1266,8 @@ const SW = { "My projects":"Miradi yangu", "Find a professional":"Tafuta mtaalam
   "Add a new project":"Ongeza mradi mpya", "Your house, stage by stage":"Nyumba yako, hatua kwa hatua", "Stages and payments":"Hatua na malipo", "All reports":"Ripoti zote",
   "Contractor record":"Rekodi ya mkandarasi", "Surveyor’s report":"Ripoti ya mkaguzi", "Help desk":"Dawati la msaada", "Common questions":"Maswali ya kawaida", "Send":"Tuma",
   "Translate":"Tafsiri", "Listen":"Sikiliza", "Speak":"Ongea", "Photo":"Picha", "Your account":"Akaunti yako", "Read the report":"Soma ripoti", "All messages":"Ujumbe wote" };
-const L = t => SET().lang === "sw" && SW[t] ? SW[t] : t;
+/* Labels stay in English until the whole screen can be translated, so nobody sees a half-translated page */
+const L = t => t;
 const LANGS = [
   {k:"en", name:"English", native:"English"}, {k:"sw", name:"Kiswahili", native:"Kiswahili", tts:"sw"},
   {k:"ki", name:"Kikuyu", native:"Gĩkũyũ"}, {k:"kam", name:"Kamba", native:"Kĩkamba"}, {k:"kln", name:"Kalenjin", native:"Kalenjin"},
@@ -1143,8 +1287,8 @@ function setTrBanner(st){
   if(SET().lang === "en" || ui.role !== "client" || !st){ b.hidden = true; return; }
   b.hidden = false;
   b.innerHTML = st === "busy" ? `${ic("globe",20)} <span>Translating this page into ${lang.native}… The first time takes a few seconds.</span>`
-    : st === "done" ? `${ic("globe",20)} <span>Translated into ${lang.native} by Claude.${lang.k !== "sw" ? " Some words may not be right yet." : ""} <button class="linkish" data-act="help">Tell us</button> <button class="linkish" data-act="langPick">Change language</button></span>`
-    : st === "nosample" ? `${ic("alert",20)} <span>Full translation into ${lang.native} works inside the Claude app or website. ${lang.k === "sw" ? "Only the menus are in Kiswahili here." : "The page stays in English here."}</span>`
+    : st === "done" ? `${ic("globe",20)} <span>Translated into ${lang.native} by machine. Legal and building terms stay in English until a person has checked them.${lang.k !== "sw" ? " Some words may not be right yet." : ""} <button class="linkish" data-act="help">Tell us</button> <button class="linkish" data-act="langPick">Change language</button></span>`
+    : st === "nosample" ? `${ic("alert",20)} <span>${lang.native} isn’t available here yet, so the whole page is shown in English. <button class="linkish" data-act="langPick">Change language</button></span>`
     : st === "fail" ? `${ic("alert",20)} <span>Translation into ${lang.native} didn’t work this time. <button class="linkish" data-act="retryTr">Try again</button></span>`
     : `${ic("globe",20)} <span>Getting the translation ready…</span>`;
 }
@@ -1170,7 +1314,7 @@ function requestTr(lang, all){
   list.forEach(x => trPending.add(lang + "|" + x)); trBusy++; setTrBanner("busy");
   const L2 = langOf(lang);
   const prompt = `You translate the screens of Macho, a Kenyan app where people living abroad check on houses being built at home. Many readers are older and read best in their mother tongue.
-Translate each English string below into ${L2.name} (${L2.native}). Use simple, everyday words a grandparent in a rural home would understand. Keep people’s names, place names, plot numbers, money (KSh amounts), numbers, dates and times exactly as they are. Keep the app name Macho. If a construction term has no word in ${L2.name}, use the word people commonly say on Kenyan building sites.
+Translate each English string below into ${L2.name} (${L2.native}). Use simple, everyday words a grandparent in a rural home would understand. Keep people’s names, place names, plot numbers, money (KSh amounts), numbers, dates and times exactly as they are. Keep the app name Macho. Keep legal, financial and construction terms in English exactly as written (for example title deed, escrow, ring beam, damp-proof course, power of attorney, stamp duty, BORAQS, NCA), because they must be checked by a person before being translated. If a construction term has no word in ${L2.name}, use the word people commonly say on Kenyan building sites.
 Return only a JSON object whose keys are the English strings exactly as given and whose values are the translations.
 
 Strings:
@@ -1411,7 +1555,7 @@ function shots(p){
     const out = [{ i:0, label:ptype(p) === "land" ? "Survey map" : "Advert", state:"done", src:art(ptype(p) === "land" ? "map" : "apartment"),
       title:ptype(p) === "land" ? "The plot as shown on the survey map" : "The property as advertised", sub:ptype(p) === "land" ? "What the seller says you are buying." : "What the seller or developer says you are buying." }];
     MS(p).forEach((m, k) => { const st = mStatus(p, m.id), v = onsiteVisit(p, m.id);
-      if(["released","ready","fixing","fixed","disputed"].includes(st)) out.push({ i:k + 1, m, label:m.short, state:"done", src:art(m.art), vid:v.id, title:`${m.name}: checked`, sub:`By ${VERIFIERS[v.verifierId].name}, ${v.reviewedAt}. Scored ${scoreOf(v)} out of 100.` });
+      if(["released","ready","fixing","fixed","disputed","releasing"].includes(st)) out.push({ i:k + 1, m, label:m.short, state:"done", src:art(m.art), vid:v.id, title:`${m.name}: checked`, sub:`By ${VERIFIERS[v.verifierId].name}, ${v.reviewedAt}. Scored ${scoreOf(v)} out of 100.` });
       else out.push({ i:k + 1, m, label:m.short, state:"future", src:art(m.art), title:`${m.name}: not started`, sub:m.detail }); });
     return out;
   }
@@ -1419,7 +1563,7 @@ function shots(p){
   MS(p).forEach((m, k) => {
     const i = k + 1, st = mStatus(p, m.id), v = onsiteVisit(p, m.id);
     const vids = pVisits(p).filter(x => x.milestoneId === m.id && x.type === "video" && x.status === "approved");
-    if(["released","ready","fixing","fixed","disputed"].includes(st)){
+    if(["released","ready","fixing","fixed","disputed","releasing"].includes(st)){
       out.push({ i, m, label:m.short, state:"done", src:houseSVG(i, 0), vid:v.id, title:`After the ${m.short.toLowerCase()} stage`,
         sub:`Checked ${v.reviewedAt} by ${VERIFIERS[v.verifierId].name}. Scored ${scoreOf(v)} out of 100.${st === "ready" ? " Waiting for your approval." : st === "fixing" || st === "fixed" ? " Payment on hold until the issues are fixed." : ""}` });
     } else if(vids.length){
@@ -1436,11 +1580,11 @@ function renderChrome(){
   const signOutBtn = SESSION ? `${SESSION.owner ? `<button class="btn ghost small-btn" data-act="toSignIn">Switch account</button>` : ""}<button class="btn ghost small-btn" data-act="signOut">Sign out</button>` : "";
   const label = needSignIn() ? (DEMO ? `<button class="btn ghost small-btn" data-act="cancelSignIn">Skip sign-in</button>` : "")
     : ui.role === "presenter" ? `<span class="who-chip"><span class="avatar">${ic("stages",20)}</span><span class="who-name">Demo controls</span></span>`
-    : ui.role === "client" ? `<nav class="client-nav" aria-label="Main"><button class="btn ${["home","project"].includes(ui.page) ? "" : "ghost"} small-btn" data-act="home" aria-label="My projects">${ic("home",20)} <span class="tr-label">${L("My projects")}</span></button>
-      <button class="btn ${ui.page === "people" ? "" : "ghost"} small-btn" data-act="people" aria-label="Find a professional">${ic("users",20)} <span class="tr-label">${L("Find a professional")}</span></button>
+    : ui.role === "client" ? `<nav class="client-nav" aria-label="Main"><button class="btn ${["home","project","reports"].includes(ui.page) ? "" : "ghost"} small-btn" data-act="home" aria-label="My projects" ${["home","project","reports"].includes(ui.page) ? 'aria-current="page"' : ""}>${ic("home",20)} <span class="tr-label">${L("My projects")}</span></button>
+      <button class="btn ${ui.page === "people" ? "" : "ghost"} small-btn" data-act="people" aria-label="Find a professional" ${ui.page === "people" ? 'aria-current="page"' : ""}>${ic("users",20)} <span class="tr-label">${L("Find a professional")}</span></button>
       <button class="btn ${ui.page === "messages" ? "" : "ghost"} small-btn nav-badge" data-act="messages" aria-label="Messages${unread() ? `, ${unread()} unread` : ""}">${ic("inbox",20)} <span class="tr-label">${L("Messages")}</span>${unread() ? `<span class="badge">${unread()}</span>` : ""}</button>
       <button class="btn ${ui.page === "help" ? "" : "ghost"} small-btn nav-badge" data-act="help" aria-label="Help desk${unread("help") ? `, ${unread("help")} unread` : ""}">${unread("help") ? `<span class="badge">${unread("help")}</span>` : ""}${ic("help",20)} <span class="tr-label">${L("Help")}</span></button></nav>
-      <button class="btn ghost small-btn lang-btn" data-act="langPick" aria-label="Language: ${langOf(SET().lang).native}" title="Language: ${langOf(SET().lang).native}" data-notr>${ic("globe",20)} <span class="lang-code">${SET().lang.toUpperCase()}</span></button>
+      <button class="btn ghost small-btn lang-btn" data-act="langPick" aria-label="Language: ${langOf(SET().lang).native}. Change language" title="Language: ${langOf(SET().lang).native}" data-notr>${ic("globe",20)} <span class="lang-code">${SET().lang.toUpperCase()}</span><span class="lang-name">${langOf(SET().lang).native}</span></button>
       <button class="who-chip who-btn" data-act="account" aria-label="${L("Your account")}"><span class="avatar" data-notr>${OWNER.initials}</span><span class="who-name" data-notr>${OWNER.first}</span></button>`
     : ui.role === "verifier" ? `${signOutBtn}<span class="who-chip"><span class="avatar">${ic("hardhat",20)}</span><span class="who-name">Professionals’ app</span></span>`
     : `${signOutBtn}<span class="who-chip"><span class="avatar">${ic("shield",20)}</span><span class="who-name">Review desk</span></span>`;
@@ -1448,7 +1592,7 @@ function renderChrome(){
     <span><span class="brand-name" data-notr>Macho</span><span class="brand-tag">Independent site checks for your build in Kenya</span></span></button><div class="top-right">${label}</div>`;
   const cv = S.visits.filter(v => ["assigned","inprogress","returned"].includes(v.status)).length + reqs().filter(r => r.status === "pending").length, cr = S.visits.filter(v => v.status === "submitted").length;
   const r = (role, t) => `<button data-act="role" data-role="${role}" aria-current="${ui.role === role && !needSignIn()}">${t}</button>`;
-  document.getElementById("protoBar").innerHTML = `${syncLabel()}<span>Demo${ROOM !== "demo" ? ` room “${esc(ROOM)}”` : ""}. You’re viewing ${needSignIn() ? "the sign-in screen" : ui.role === "presenter" ? "the demo controls" : ui.role === "client" ? "the client’s website" : ui.role === "verifier" ? "the professionals’ phone app" : "the internal review desk"}.</span>
+  document.getElementById("protoBar").innerHTML = `${syncLabel()}${S.clockShift ? `<span class="sync">${ic("clock",14)} Demo clock +${S.clockShift}h</span>` : ""}<span>Demo${ROOM !== "demo" ? ` room “${esc(ROOM)}”` : ""}. You’re viewing ${needSignIn() ? "the sign-in screen" : ui.role === "presenter" ? "the demo controls" : ui.role === "client" ? "the client’s website" : ui.role === "verifier" ? "the professionals’ phone app" : "the internal review desk"}.</span>
     <span>Switch to:</span>${r("presenter","Demo controls")}${r("client","Client")}${r("verifier", `Professionals’ app${cv ? ` (${cv})` : ""}`)}${r("review", `Review desk${cr ? ` (${cr})` : ""}`)}`;
 }
 
@@ -1487,6 +1631,17 @@ function mergePros(){
   Object.keys(VBASE).forEach(id => { VERIFIERS[id] = Object.assign(JSON.parse(JSON.stringify(VBASE[id])), (S.proEdits || {})[id] || {}); });
   Object.entries(S.extraPros || {}).forEach(([id, x]) => { VERIFIERS[id] = Object.assign({}, x, (S.proEdits || {})[id] || {}); VERIFIERS[id].services = ROLE_INFO[x.role].for.split(","); });
 }
+const FIN2 = "Ruth Wambui";
+const money0 = p => p.money || (p.money = { funded:{}, releases:{}, payee:null });
+const isFunded = (p, mid) => !!money0(p).funded[mid];
+const relOf = (p, mid) => money0(p).releases[mid];
+function moneySummary(p){
+  const mo = money0(p); let held = 0, paid = 0, toFund = 0;
+  MS(p).forEach(m => { const a = amt(p, m.id); if(!a) return; const r = mo.releases[m.id];
+    if(r && r.status === "paid") paid += a; else if(mo.funded[m.id]) held += a; else toFund += a; });
+  return { held, paid, toFund };
+}
+const escrowRef = (p, m) => `MCH-${p.id.toUpperCase()}-${m.id.toUpperCase()}`;
 const isAway = id => VERIFIERS[id] && VERIFIERS[id].away;
 const proAlert = (sid, k) => { const n = ((S.proEdits || {})[sid] || {}).notify; return n ? !!n[k] : k === "wa"; };
 const favs = () => S.favs || (S.favs = ["v3"]);
@@ -1574,6 +1729,10 @@ function viewPresenter(){
     : `<section class="card" style="margin-top:20px"><h2>${ic("plus",28)} Start a fresh demo</h2>
         <p>Inside Claude, a fresh demo means resetting the sample data on this device. To give each person their own link, use the version hosted on GitHub.</p>
         <div class="btn-row"><button class="btn sign" data-act="freshLocal">${ic("archive",20)} Reset to fresh sample data</button></div></section>`}
+    <section class="card" style="margin-top:16px"><h2>${ic("clock",28)} Demo clock</h2>
+      <p class="small">Move time forward to show reminders firing for everyone: professionals who haven’t answered, clients who haven’t decided, contractors with fixes due, and payments waiting at the bank.</p>
+      <div class="btn-row">${[["2","+2 hours"],["12","+12 hours"],["24","+1 day"],["72","+3 days"]].map(([v, t]) => `<button class="btn ghost small-btn" data-act="clock" data-v="${v}">${ic("fastfwd",16)} ${t}</button>`).join("")}${S.clockShift ? `<button class="btn ghost small-btn" data-act="clock" data-v="0">Back to now</button>` : ""}</div>
+      <p class="tiny muted" style="margin-top:6px">${S.clockShift ? `The demo is ${S.clockShift} hours ahead of real time.` : "Running at real time."}</p></section>
     <section class="card" style="margin-top:16px"><h2>${ic("stages",28)} While presenting</h2>
       <label class="opt"><input type="checkbox" data-field="setBar" ${LOCALSET.hideBar ? "" : "checked"}><span><strong>Show the blue prototype bar</strong><span class="small muted" style="display:block">Lets you jump between the client, professional and review desk sides. Turn it off to show the app as a real customer would see it.</span></span></label>
       <div class="btn-row"><button class="btn ghost" data-act="role" data-role="client">${ic("home",20)} Go to the client side</button><button class="btn ghost" data-act="toSignIn">${ic("lock",20)} Show the sign-in screen</button>${SESSION ? `<button class="btn ghost" data-act="signOut">Sign out</button>` : ""}</div></section>`;
@@ -1586,6 +1745,7 @@ function actionLine(p){
   const st = mStatus(p, cur.id), v = onsiteVisit(p, cur.id);
   if(st === "ready") return {tone:"wait", icon:"alert", text:`Report ready: scored ${scoreOf(v)} out of 100`};
   if(st === "disputed") return {tone:"", icon:"help", text:"Report under review by a senior surveyor"};
+  if(st === "releasing") return {tone:"ok", icon:"bank", text:"Payment on its way to the " + TYPES[ptype(p)].payee};
   if(st === "fixing") return {tone:"", icon:"lock", text:`Payment on hold: fixes due ${activeFix(p, cur.id).due}`};
   if(st === "fixed") return {tone:"wait", icon:"calendar", text:"Fixed: book the re-check visit"};
   if(st === "booked") return {tone:"", icon:"calendar", text:`${VERIFIERS[v.verifierId].name} visits ${v.scheduled.replace(/ \d{4},/, ",")}`};
@@ -1594,30 +1754,75 @@ function actionLine(p){
   const pr = pendingReq(p, cur.id); if(pr) return {tone:"", icon:"clock", text:`Waiting for ${VERIFIERS[pr.sid].name} to accept`};
   return {tone:"wait", icon:"calendar", text:ptype(p) === "build" ? `Book the ${cur.short.toLowerCase()} visit` : `Book the ${cur.short.toLowerCase()} check`};
 }
+/* One plain status for a project’s inspection, always as words, never colour alone */
+function inspStatus(p){
+  const cur = currentMilestone(p);
+  if(p.closed) return { t:"Closed", k:"info", i:"archive" };
+  if(!cur) return { t:"Completed", k:"ok", i:"check" };
+  const st = mStatus(p, cur.id);
+  return ({ upcoming: pendingReq(p, cur.id) ? { t:"Waiting for a professional to accept", k:"info", i:"clock" } : { t:"Action required: book the inspection", k:"action", i:"calendar" },
+    booked:{ t:"Inspection scheduled", k:"info", i:"calendar" }, onsite:{ t:"Inspection in progress", k:"info", i:"hardhat" },
+    review:{ t:"Inspection completed: report being checked", k:"info", i:"shield" }, ready:{ t:"Report ready: action required", k:"action", i:"alert" },
+    fixing:{ t:"Waiting for fixes", k:"info", i:"lock" }, fixed:{ t:"Action required: book the re-check", k:"action", i:"calendar" },
+    disputed:{ t:"Report under review", k:"info", i:"help" }, releasing:{ t:"Payment being released", k:"ok", i:"bank" } })[st] || { t:STATUS[st] || "", k:"info", i:"clock" };
+}
+const statusChip = x => `<span class="schip ${x.k}">${ic(x.i,16)} ${x.t}</span>`;
+function reportsWaiting(){ return S.projects.filter(p => !p.closed).map(p => { const c = currentMilestone(p); return c && mStatus(p, c.id) === "ready" ? { p, m:c, v:onsiteVisit(p, c.id) } : null; }).filter(Boolean); }
+function viewReports(){
+  const wait = reportsWaiting();
+  const all = S.visits.filter(v => v.status === "approved" && pById(v.projectId)).slice().sort((a, b) => (tsOf(b.reviewedAt) || 0) - (tsOf(a.reviewedAt) || 0));
+  const row = (v, waiting) => { const p = pById(v.projectId), m = mById(v.milestoneId), b = band(v);
+    return `<li><div class="r-main">${ic(TYPES[ptype(p)].icon,26)}<div><div class="r-title">${esc(p.name)}, ${esc(p.town)}</div>
+      <div class="small">${m.name}${v.type === "video" ? " (video check-in)" : ""}. Checked ${esc(String(v.reviewedAt).split(",")[0])} by ${VERIFIERS[v.verifierId].name}.</div>
+      <div class="small" style="margin-top:4px"><strong>${b.t}</strong>, ${scoreOf(v)} out of 100</div></div></div>
+      <span class="btn-row" style="margin:0"><button class="btn ${waiting ? "sign" : "ghost"} small-btn" data-act="openReport" data-vid="${v.id}">${ic("doc",18)} Open report</button>
+      ${waiting ? `<button class="btn ghost small-btn" data-act="openProject" data-pid="${p.id}">Decide in project</button>` : ""}</span></li>`; };
+  return `<button class="back" data-act="home">${ic("back",20)} My projects</button>
+    <h1 class="hello">My inspection reports</h1>
+    <p class="hello-sub">Every report from an independent professional, checked by our review desk before you see it.</p>
+    <section class="card" style="margin-top:20px"><h2>${ic("alert",24)} Waiting for your decision (${wait.length})</h2>
+      ${wait.length ? `<p class="small">Read the report, then approve the payment or ask for fixes. Your money stays held until you decide.</p><ul class="rows">${wait.map(x => row(x.v, true)).join("")}</ul>` : `<p class="empty-msg">Nothing is waiting for you.</p>`}</section>
+    <section class="card" style="margin-top:20px"><h2>${ic("doc",24)} All reports (${all.length})</h2><ul class="rows">${all.map(v => row(v, false)).join("")}</ul></section>`;
+}
 function viewHome(){
   const open = S.projects.filter(p => !p.closed), closed = S.projects.filter(p => p.closed), HF = ui.hf || "all";
   const shown = open.filter(p => HF === "all" || ptype(p) === HF);
   const waiting = open.filter(p => { const c = currentMilestone(p); return c && mStatus(p, c.id) === "ready"; }).length;
   const cnt = k => open.filter(p => ptype(p) === k).length;
   const nu = unread();
-  return `<h1 class="hello">${L("Hello")}, ${OWNER.first}</h1>
-    ${nu ? `<button class="newmsg" data-act="messages">${ic("inbox",24)} <span>You have ${nu} new ${nu > 1 ? "messages" : "message"}</span><span class="newmsg-go">Open messages</span></button>` : ""}
-    <p class="hello-sub">${open.length} active ${open.length === 1 ? "project" : "projects"}. ${waiting ? `${waiting} ${waiting > 1 ? "reports are" : "report is"} waiting for you.` : "Nothing needs your attention today."}</p>
-    <h2 class="what-h">What would you like to do?</h2>
-    <div class="what">${Object.entries(TYPES).map(([k, t]) => `<button class="whatbtn" data-act="newProject" data-type="${k}"><span class="whaticon">${ic(t.icon,30)}</span><span><strong>${t.label}</strong><span class="small muted">${{build:"Every building stage checked before you pay", land:"Title, beacons and seller checked before you pay", home:"Proof it exists, and that it’s really the seller’s"}[k]}</span></span></button>`).join("")}
-      <div class="whatbtn soon" aria-disabled="true"><span class="whaticon">${ic("car",30)}</span><span><strong>Buy a vehicle</strong><span class="small muted">Coming later: logbook search and a mechanic’s check</span></span></div></div>
-    <div class="chips pick" style="margin-top:22px">${[["all","All",open.length],["build","Building",cnt("build")],["land","Land",cnt("land")],["home","Houses and flats",cnt("home")]].map(([k, t, n]) => `<button data-act="hf" data-v="${k}" aria-pressed="${HF === k}">${t} (${n})</button>`).join("")}</div>
+  const sum = open.reduce((t, p) => { const ms = moneySummary(p); t.held += ms.held; return t; }, { held:0 });
+  const booked = open.filter(p => { const c = currentMilestone(p); return c && ["booked","onsite"].includes(mStatus(p, c.id)); }).length;
+  const showMsg = nu && nu !== ui.dismissedMsgs;
+  return `<h1 class="hello">Welcome back, ${OWNER.first}</h1>
+    <p class="hello-sub">Here is an update on your properties.</p>
+    <div class="sumcards">
+      <button class="sumcard" data-act="hf" data-v="all"><strong>${open.length}</strong><span>active ${open.length === 1 ? "project" : "projects"}</span></button>
+      <button class="sumcard ${waiting ? "hot" : ""}" data-act="reports"><strong>${waiting}</strong><span>${waiting === 1 ? "report" : "reports"} waiting for your decision</span></button>
+      <div class="sumcard"><strong>${booked}</strong><span>${booked === 1 ? "inspection" : "inspections"} booked or under way</span></div>
+      <div class="sumcard"><strong>${money(sum.held)}</strong><span>of your money held safely in escrow</span></div>
+    </div>
+    ${waiting ? `<div class="actionbar">${ic("alert",26)}<div style="flex:1"><strong>${waiting} inspection ${waiting === 1 ? "report is" : "reports are"} waiting for you</strong><p class="small">Read ${waiting === 1 ? "it" : "each one"}, then approve the payment or ask for fixes.</p></div>
+      <button class="btn sign" data-act="reports">${ic("doc",20)} View my inspection reports</button></div>` : ""}
+    ${showMsg ? `<div class="newmsg">${ic("inbox",24)} <span>You have ${nu} new ${nu > 1 ? "messages" : "message"}</span>
+      <span class="newmsg-actions"><button class="btn small-btn" data-act="messages">Open messages</button><button class="btn ghost small-btn" data-act="dismissMsgs" data-v="${nu}" aria-label="Dismiss this notice">Dismiss</button></span></div>` : ""}
+    <h2 class="what-h">Your projects</h2>
+    <div class="chips pick" style="margin-top:8px" aria-label="Show projects">${[["all","All",open.length],["build","Building",cnt("build")],["land","Land",cnt("land")],["home","Houses and flats",cnt("home")]].map(([k, t, n]) => `<button data-act="hf" data-v="${k}" aria-pressed="${HF === k}">${t} (${n})</button>`).join("")}</div>
     <div class="projects">${shown.map(p => {
       const cur = currentMilestone(p), n = cur ? mIdx(cur.id) + 1 : MS(p).length, a = actionLine(p), sh = shots(p)[latestShot(p)], pct = Math.round(released(p) / p.budget * 100);
-      return `<article class="card pcard"><img class="pthumb" src="${sh.src}" alt="Drawing of ${esc(p.name)} at its current stage">
-        <div class="pbody"><h2>${esc(p.name)}</h2><p class="loc">${ic("pin",20)} ${esc(p.town)}, ${esc(p.county)}</p>
-          <p class="ptype">${ic(TYPES[ptype(p)].icon,18)} ${TYPES[ptype(p)].label}</p>
-          <p class="stage-line">${cur ? `Step ${n} of ${MS(p).length}: ${cur.name}` : `All ${MS(p).length} steps complete`}</p>
-          <div class="bar" role="img" aria-label="${pct}% of the budget released"><span style="width:${pct}%"></span></div>
-          <p class="money-line">${money(released(p))} released of ${money(p.budget)}</p>
-          <p class="action ${a.tone}">${ic(a.icon,22)} ${esc(a.text)}</p><span class="spacer"></span>
-          <button class="btn wide" data-act="openProject" data-pid="${p.id}">${L("Open project")}</button></div></article>`; }).join("")}
+      const stx = inspStatus(p);
+      return `<article class="card pcard"><img class="pthumb" src="${sh.src}" alt="">
+        <div class="pbody"><p class="ptype">${ic(TYPES[ptype(p)].icon,18)} ${TYPES[ptype(p)].label}</p>
+          <h3 class="pname">${esc(p.name)}</h3><p class="loc">${ic("pin",18)} ${esc(p.town)}, ${esc(p.county)}</p>
+          <dl class="pfacts"><dt>Stage</dt><dd>${cur ? `Step ${n} of ${MS(p).length}: ${cur.name}` : `All ${MS(p).length} steps complete`}</dd>
+            <dt>Inspection</dt><dd>${statusChip(stx)}</dd>
+            <dt>Money</dt><dd>${money(released(p))} paid of ${money(p.budget)}</dd></dl>
+          <span class="spacer"></span>
+          <button class="btn wide" data-act="openProject" data-pid="${p.id}" aria-label="View project: ${esc(p.name)} in ${esc(p.town)}">View project</button></div></article>`; }).join("")}
     </div>
+    ${shown.length ? "" : `<div class="card"><p class="empty-msg">No projects here yet. Start one below.</p></div>`}
+    <h2 class="what-h">Start something new</h2>
+    <div class="what">${Object.entries(TYPES).map(([k, t]) => `<button class="whatbtn" data-act="newProject" data-type="${k}"><span class="whaticon">${ic(t.icon,30)}</span><span><strong>${t.label}</strong><span class="small muted">${{build:"Get independent checks at every stage of construction.", land:"Verify ownership and important documents before you pay.", home:"Confirm the property and seller’s details before buying."}[k]}</span></span><span class="whatgo" aria-hidden="true">${ic("plus",22)}</span></button>`).join("")}</div>
+    <p class="small muted soonline">${ic("car",18)} Coming later: buying a vehicle, with a logbook search and a mechanic’s check.</p>
     ${closed.length ? `<div class="closed"><button class="btn ghost" data-act="toggleClosed" aria-expanded="${!!ui.showClosed}">${ic("archive",20)} Closed projects (${closed.length})</button>
       ${ui.showClosed ? `<ul class="rows card" style="margin-top:12px">${closed.map(p => `<li><div class="r-main">${ic(TYPES[ptype(p)].icon,24)}<div><div class="r-title">${esc(p.name)}, ${esc(p.town)}</div>
         <div class="small muted">${TYPES[ptype(p)].label}. Closed ${esc(p.closed.on)}${p.closed.why ? `: ${esc(p.closed.why)}` : ""}.</div></div></div>
@@ -1721,7 +1926,7 @@ function bubble(m){
   const locCard = m.loc ? locHTML(m.loc, mine) : "";
   const link = m.vid && vById(m.vid) ? `<button class="btn ghost small-btn" style="margin-top:8px" data-act="openReport" data-vid="${m.vid}">${ic("clipboard",18)} Read the report</button>`
     : m.pid && pById(m.pid) ? `<button class="btn ghost small-btn" style="margin-top:8px" data-act="openProject" data-pid="${m.pid}">Open project</button>` : "";
-  return `<div class="bub ${mine ? "me" : ""}"><div class="bub-in" data-notr>${m.sample ? `<span class="tiny muted">Sample reply</span><br>` : ""}${img}${locCard}${esc(m.text)}${link}${tr}</div>
+  return `<div class="bub ${mine ? "me" : ""}"><div class="bub-in" data-notr>${m.chase ? `<span class="pill wait" style="margin-bottom:6px">${ic("bell",13)} Reminder: ${LEVEL[m.level] || ""}</span><br>` : ""}${m.sample ? `<span class="tiny muted">Sample reply</span><br>` : ""}${img}${locCard}${esc(m.text)}${link}${tr}</div>
     <span class="bub-meta"><span class="tiny muted">${esc(m.at)}</span>${receipt}${wa}${tools}</span></div>`;
 }
 function threadHTML(t){
@@ -1824,6 +2029,7 @@ function viewProject(p){
     </div>
     <div class="col">
       <section class="o2">${nextHTML(p)}</section>
+      <section class="o5b">${moneyHTML(p)}</section>
       <section class="o6">${reportsHTML(p)}</section>
       <section class="o7">${ptype(p) === "build" ? scoreHTML(p) : rolesHTML(p)}</section>
     </div>
@@ -1873,6 +2079,31 @@ function checklistPreview(m){
       <div><h4>Photo ${n + 1}: ${s.label}</h4>${m.items.filter(i => i.shot === s.id).map(it => `<div class="ck"><span class="box"></span><div><div class="ck-q">${it.q}</div><div class="std">${it.std}</div>
         <div class="tags"><span class="tag-w">Weight ${it.w}</span>${it.crit ? `<span class="tag-must">${ic("lock",12)} Must pass</span>` : ""}</div></div></div>`).join("")}</div></div>`).join("")}`;
 }
+const REL_STEPS = ["You approved","Checked by 2 Macho staff","Sent to the bank","Paid"];
+function releaseTrack(r){
+  if(!r) return "";
+  const k = r.status === "requested" ? (r.approvals.length ? 1 : 0) : r.status === "sent" ? 2 : r.status === "paid" ? 4 : 0;
+  return `<ol class="pipe rel">${REL_STEPS.map((t, i) => `<li class="${i < k || (i === 0) ? "done" : i === k ? "now" : ""}"><span class="pd">${i < k || i === 0 ? ic("check",14) : i + 1}</span><span>${i === 1 && r.status === "requested" ? `Checked (${r.approvals.length} of 2)` : t}</span></li>`).join("")}</ol>
+    ${r.status === "paid" ? `<p class="small paid">${ic("check",16)} Paid ${esc(r.paidAt)}. Bank reference ${esc(r.bankRef)}.</p>` : r.status === "sent" ? `<p class="small">${ic("clock",16)} With the bank since ${esc(r.sentAt)}. Usually same day.</p>` : `<p class="small">${ic("clock",16)} Requested ${esc(r.requestedAt)}.</p>`}`;
+}
+function moneyHTML(p){
+  const mo = money0(p), sum = moneySummary(p), cur = currentMilestone(p);
+  const pill = m => { const a = amt(p, m.id), r = mo.releases[m.id], f = mo.funded[m.id];
+    if(!a) return `<span class="pill">No payment</span>`;
+    if(r && r.status === "paid") return `<span class="pill pass">Paid ${esc(r.paidAt)}</span>`;
+    if(r) return `<span class="pill wait">${r.status === "sent" ? "Bank sending" : "Release requested"}</span>`;
+    if(f) return `<span class="pill held">${ic("lock",13)} Held</span>`;
+    return `<span class="pill">Not funded</span>`; };
+  const needFund = cur && amt(p, cur.id) && !mo.funded[cur.id];
+  return `<div class="card"><h2>${ic("bank",28)} Money</h2>
+    <div class="estats"><div class="stat"><strong>${money(sum.held)}</strong><span>held safely in escrow</span></div><div class="stat"><strong>${money(sum.paid)}</strong><span>paid out</span></div><div class="stat"><strong>${money(sum.toFund)}</strong><span>still to send</span></div></div>
+    ${needFund ? `<div class="callout ${["ready","fixed"].includes(mStatus(p, cur.id)) ? "bad" : ""}" style="margin-top:12px">${ic("alert",22)}<div style="flex:1"><p><strong>Send ${money(amt(p, cur.id))} for ${cur.name.toLowerCase()}.</strong> It stays in escrow until the stage passes its check and you approve.</p>
+      <div class="btn-row" style="margin-top:8px"><button class="btn sign small-btn" data-act="fund" data-pid="${p.id}" data-mid="${cur.id}">${ic("money",18)} Send money to escrow</button></div></div></div>` : ""}
+    <ul class="rows" style="margin-top:8px">${MS(p).filter(m => amt(p, m.id)).map(m => `<li><div class="r-main"><div><div class="r-title">${m.name}</div><div class="small muted">${money(amt(p, m.id))}${mo.funded[m.id] ? `, received ${esc(mo.funded[m.id].on)}` : ""}</div></div></div>${pill(m)}</li>`).join("")}</ul>
+    <div class="payee">${ic("shield",20)}<div><strong>Pays out only to:</strong> ${mo.payee ? `${esc(mo.payee.name)}, ${esc(mo.payee.bank)} account ending ${esc(mo.payee.last4)}. <span class="paid">Name checked with the bank.</span>` : `<span class="note">No account added yet.</span>`}
+      <div><button class="linkish small" data-act="payee" data-pid="${p.id}">${mo.payee ? "Change account" : "Add the account"}</button></div></div></div>
+    <p class="tiny muted" style="margin-top:8px">In the live app, money sits with a licensed partner bank in an account for this project, never with Macho.</p></div>`;
+}
 function rolesHTML(p){
   const roles = [...new Set(MS(p).flatMap(m => m.roles))];
   return `<div class="card"><h2>${ic("users",28)} Who checks what</h2>
@@ -1880,9 +2111,9 @@ function rolesHTML(p){
     ${roles.map(r => `<div class="roleinfo"><strong>${r}</strong><p class="small">${ROLE_INFO[r].does}</p><p class="small muted">${ROLE_INFO[r].never}</p></div>`).join("")}</div>`;
 }
 function stageRow(p, m, k){
-  const st = mStatus(p, m.id), a = amt(p, m.id), busy = ["booked","onsite","review","fixing","fixed","disputed"].includes(st) ? " busy" : "", v = onsiteVisit(p, m.id);
+  const st = mStatus(p, m.id), a = amt(p, m.id), busy = ["booked","onsite","review","fixing","fixed","disputed","releasing"].includes(st) ? " busy" : "", v = onsiteVisit(p, m.id);
   const sc = (st === "released" || st === "ready") && v && v.status === "approved" ? `, scored ${scoreOf(v)}` : "";
-  const label = st === "fixing" || st === "fixed" || st === "disputed" ? `${ic("lock",18)} ${STATUS[st]}` : st === "released" ? `${ic("check",18)} ${a ? "Paid" : "Verified"} ${p.paid[m.id]}${sc}` : st === "ready" ? `${ic("alert",18)} ${STATUS[st]}${sc}` : busy ? `${ic("hardhat",18)} ${STATUS[st]}` : `${ic("clock",18)} ${STATUS[st]}`;
+  const label = st === "releasing" ? `${ic("bank",18)} ${STATUS[st]}` : st === "fixing" || st === "fixed" || st === "disputed" ? `${ic("lock",18)} ${STATUS[st]}` : st === "released" ? `${ic("check",18)} ${a ? "Paid" : "Verified"} ${p.paid[m.id]}${sc}` : st === "ready" ? `${ic("alert",18)} ${STATUS[st]}${sc}` : busy ? `${ic("hardhat",18)} ${STATUS[st]}` : `${ic("clock",18)} ${STATUS[st]}`;
   return `<li><button class="stage${busy}" data-s="${st}" data-act="openMilestone" data-pid="${p.id}" data-mid="${m.id}">
     <span class="num">${st === "released" ? ic("check",24) : k + 1}</span><span><span class="st-name">${m.name}</span><span class="st-status">${label}</span></span>
     <span class="st-amt">${a ? money(a) : "No payment"}</span></button></li>`;
@@ -1919,6 +2150,8 @@ function nextHTML(p){
   else if(st === "onsite") h = v.status === "returned"
       ? `<h2>${ic("hardhat",30)} Report being corrected</h2><p>Our review desk asked ${ver.name} to fix something before you see the report.</p><p class="hint">Switch to the Professionals’ app to make the correction.</p>`
       : `<h2>${ic("hardhat",30)} ${ver.name} is on site now</h2><p>Checked in ${esc(v.checkedInAt)}. You’ll get the report once our review desk has checked it.</p><p class="hint">Switch to the Professionals’ app to continue the visit.</p>`;
+  else if(st === "releasing"){ const r = relOf(p, cur.id);
+    h = `<h2>${ic("bank",30)} Payment on its way</h2><p>You approved ${money(a)} for ${cur.name.toLowerCase()}. The money leaves escrow only after two Macho finance staff check it, then the bank pays ${esc(p.contractor)}.</p>${releaseTrack(r)}`; }
   else if(st === "disputed"){ const c = openCase(p, cur.id);
     h = `<h2>${ic("help",30)} Report under review</h2><p>You disagreed with the ${cur.name.toLowerCase()} report. Payment is paused while we look into it.</p>${caseTracker(c)}`; }
   else if(st === "fixing"){ const f = activeFix(p, cur.id);
@@ -2140,6 +2373,10 @@ function seedProFeed(st){
   st.requests.filter(r => r.status === "pending").forEach(r => { const p = st.projects.find(x => x.id === r.pid);
     feed(r.sid, r.sentAt + ", 08:41", `New request from ${OWNER.first}: ${mById(r.mid).name.toLowerCase()} visit at ${p.town}, ${r.date}, ${r.time}. Accept or decline it in Jobs.`, { tab:"jobs" }); });
 }
+const NOWMS = () => Date.now() + ((S && S.clockShift) || 0) * 3600000;
+const tsOf = str => { const m = String(str || "").match(/(\d{1,2}) (\w{3,4}) (\d{4})(?:, (\d{1,2}):(\d{2}))?/); if(!m) return null;
+  const d = new Date(Date.parse(`${m[1]} ${m[2].slice(0, 3)} ${m[3]}`)); if(isNaN(d)) return null; if(m[4]) d.setHours(+m[4], +m[5]); return d.getTime(); };
+const ago = ms => { const h = Math.max(0, Math.round((NOWMS() - ms) / 3600000)); return h < 48 ? `${h} ${h === 1 ? "hour" : "hours"}` : `${Math.round(h / 24)} days`; };
 const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 function dayKey(str){ const m = String(str).match(/(\d{1,2}) (\w{3,4}) (\d{4})/); if(!m) return null; const d = new Date(Date.parse(`${m[1]} ${m[2].slice(0, 3)} ${m[3]}`)); return isNaN(d) ? null : ymd(d); }
 const timeOf = str => (String(str).match(/(\d{1,2}:\d{2})/) || [,""])[1];
@@ -2169,7 +2406,7 @@ function proBubble(m){
   const loc = m.loc ? locHTML(m.loc, false) : "";
   const link = m.vid && vById(m.vid) && vById(m.vid).verifierId === ui.signedIn ? `<button class="btn ghost small-btn" style="margin-top:8px" data-act="openProProj" data-pid="${vById(m.vid).projectId}">${ic("folder",18)} See it in Projects</button>`
     : m.tab ? `<button class="btn ghost small-btn" style="margin-top:8px" data-act="vTab" data-t="${m.tab}">Open ${m.tab === "jobs" ? "Jobs" : m.tab === "earnings" ? "Earnings" : "it"}</button>` : "";
-  return `<div class="bub ${mine ? "me" : ""}"><div class="bub-in" data-notr>${img}${loc}${esc(m.text)}${link}</div>
+  return `<div class="bub ${mine ? "me" : ""}"><div class="bub-in" data-notr>${m.chase ? `<span class="pill wait" style="margin-bottom:6px">${ic("bell",13)} Reminder: ${LEVEL[m.level] || ""}</span><br>` : ""}${img}${loc}${esc(m.text)}${link}</div>
     <span class="bub-meta"><span class="tiny muted">${esc(m.at)}</span>${m.from === "macho" && proAlert(ui.signedIn, "wa") ? `<span class="tiny muted">${ic("chat",13)} Also sent to your WhatsApp</span>` : ""}${m.from === "macho" && proAlert(ui.signedIn, "sms") ? `<span class="tiny muted">and by SMS</span>` : ""}</span></div>`;
 }
 function proMessagesHTML(){
@@ -2382,6 +2619,29 @@ function viewReview(){
           <td>${st.qual == null ? "–" : st.qual + " / 4"}</td><td>${st.waiting ? money(st.waiting) : "–"}</td></tr>`; }).join("")}</tbody></table></div>
       <p class="tiny muted" style="margin-top:8px">First-time approval below 80% is highlighted: a sign the professional may need coaching.</p>`;
   }
+  if(T === "rel"){
+    const rows = []; S.projects.forEach(p => Object.entries(money0(p).releases).forEach(([mid, r]) => { if(r.status !== "paid") rows.push({ p, m:mById(mid), r }); }));
+    list = rows.length ? `<ul class="rows">${rows.map(({ p, m, r }) => { const v = onsiteVisit(p, m.id), pay = money0(p).payee, ok = [
+        [v && v.status === "approved", "Report approved by the review desk"], [true, "Client approved the payment"], [!openCase(p, m.id), "No open dispute"],
+        [isFunded(p, m.id), "Money is held in escrow"], [pay, pay ? `Pays to ${pay.name}, ${pay.bank} ••••${pay.last4}, name checked` : "Payee account checked"]];
+      const by = r.approvals, first = by.includes(REVIEWER);
+      return `<li style="display:block"><div class="req-head"><strong>${money(amt(p, m.id))}: ${m.name}, ${esc(p.town)}</strong><span class="pill ${r.status === "sent" ? "pass" : "wait"}">${r.status === "sent" ? "With the bank" : `Checks ${by.length} of 2`}</span></div>
+        <ul class="checks small" style="margin-top:6px">${ok.map(([y, t]) => `<li><span class="tick ${y ? "" : "no"}">${ic(y ? "check" : "cross",14)}</span><span>${t}</span></li>`).join("")}</ul>
+        ${by.length ? `<p class="tiny muted">Checked by ${by.join(" and ")}.</p>` : ""}
+        <div class="btn-row" style="margin-top:6px">${r.status === "requested" ? `${!first ? `<button class="btn sign small-btn" data-act="relApprove" data-pid="${p.id}" data-mid="${m.id}" data-who="${REVIEWER}" ${ok.every(x => x[0]) ? "" : "disabled"}>${ic("check",18)} Approve release (${REVIEWER})</button>` : ""}
+          ${first && !by.includes(FIN2) ? `<button class="btn sign small-btn" data-act="relApprove" data-pid="${p.id}" data-mid="${m.id}" data-who="${FIN2}">${ic("check",18)} Prototype: second check by ${FIN2}</button>` : ""}`
+          : `<button class="btn small-btn" data-act="relPaid" data-pid="${p.id}" data-mid="${m.id}">${ic("bank",18)} Prototype: bank confirms payment</button>`}</div></li>`; }).join("")}</ul>
+      <p class="tiny muted">Two different people must approve every release. One person can never move client money alone.</p>`
+      : `<p class="empty-msg">No releases waiting. When a client approves a stage payment, it comes here for two checks before the bank pays.</p>`;
+  }
+  if(T === "chase"){
+    const cs = computeChasers(), who = { client:"Client", pro:"Professional", review:"Review desk", contractor:"Contractor or seller", finance:"Finance" };
+    list = `<div class="clockbar">${ic("clock",20)} <span>Demo clock: <strong>${new Date(NOWMS()).toLocaleString("en-GB", { weekday:"short", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" })}</strong>${S.clockShift ? ` (${S.clockShift} hours ahead)` : ""}</span>
+        <span class="btn-row" style="margin:0">${[["2","+2 hours"],["12","+12 hours"],["24","+1 day"],["72","+3 days"]].map(([v, t]) => `<button class="btn ghost small-btn" data-act="clock" data-v="${v}">${ic("fastfwd",16)} ${t}</button>`).join("")}${S.clockShift ? `<button class="btn ghost small-btn" data-act="clock" data-v="0">Back to now</button>` : ""}</span></div>
+      <p class="tiny muted" style="margin:8px 0">Move the clock forward to watch reminders climb: app, WhatsApp, SMS, then a help desk call.</p>
+      ${cs.length ? `<div class="tablewrap"><table class="ptable"><thead><tr><th>Waiting on</th><th>What</th><th>Waiting</th><th>Reminder</th></tr></thead><tbody>${cs.map(c => `<tr><td><strong>${esc(c.party || who[c.who])}</strong><div class="tiny muted">${c.whoLabel || who[c.who]}</div></td><td class="small">${esc(c.text)}</td><td class="small">${esc(c.age || "")}</td><td><span class="pill ${c.level === "call" || c.level === "flag" ? "issue" : "wait"}">${LEVEL[c.level]}</span></td></tr>`).join("")}</tbody></table></div>`
+        : `<p class="empty-msg">Nothing overdue. Everyone is on time.</p>`}`;
+  }
   if(T === "join"){
     const list2 = apps().slice().reverse();
     list = list2.length ? `<ul class="rows">${list2.map(a => `<li style="display:block"><div class="r-main"><span class="pav" style="background:#5B3F8C">${initials(a.name)}</span><div style="flex:1">
@@ -2392,7 +2652,7 @@ function viewReview(){
           ${ui.rejecting === a.id ? `<p class="small" style="margin-top:8px"><strong>Why not?</strong> The applicant sees this.</p><div class="chips pick">${["Registration not found on the board’s register","Name doesn’t match the ID","Linked to a contractor, developer or seller","Details incomplete"].map(r => `<button data-act="apRejectWhy" data-id="${a.id}" data-v="${r}">${r}</button>`).join("")}</div>` : ""}` : a.note ? `<p class="small">Reason: ${esc(a.note)}</p>` : ""}</div></div></li>`).join("")}</ul>`
       : `<p class="empty-msg">No applications. People who sign in as a professional with a new number apply here, and can’t take jobs until approved.</p>`;
   }
-  const tabs = [["todo","To review",todo.length],["back","Sent back",back.length],["done","Approved",appr.length],["cases","Disputes",openCases.length],["pay","Fees to pay",owed.length],["pros","Professionals",0],["join","Join requests",apps().filter(a => a.status === "pending").length]];
+  const tabs = [["todo","To review",todo.length],["back","Sent back",back.length],["done","Approved",appr.length],["cases","Disputes",openCases.length],["pay","Fees to pay",owed.length],["pros","Professionals",0],["join","Join requests",apps().filter(a => a.status === "pending").length],["rel","Releases",S.projects.reduce((n, p) => n + Object.values(money0(p).releases).filter(r => r.status !== "paid").length, 0)],["chase","Chasers",computeChasers().length]];
   return `<h1 class="hello">Review desk</h1>
     <p class="hello-sub">A second person checks every report before the client sees it.</p>
     <div class="kpis">
@@ -2403,6 +2663,9 @@ function viewReview(){
       ${kpi(openCases.length, "open client disputes", "cases", openCases.length ? "hot" : "")}
       ${kpi(money(owed.reduce((a, x) => a + netOf(x), 0)), "professionals’ fees to pay", "pay", "")}
       ${kpi(apps().filter(a => a.status === "pending").length, "professionals waiting to join", "join", apps().some(a => a.status === "pending") ? "hot" : "")}
+      ${(() => { const n = S.projects.reduce((k, p) => k + Object.values(money0(p).releases).filter(r => r.status !== "paid").length, 0); return kpi(n, "payments waiting to be released", "rel", n ? "hot" : ""); })()}
+      ${(() => { const n = computeChasers().length; return kpi(n, "reminders running", "chase", n ? "hot" : ""); })()}
+      ${kpi(money(S.projects.reduce((k, p) => k + moneySummary(p).held, 0)), "client money held in escrow", "rel", "")}
     </div>
     <div class="chips pick" style="margin-top:22px" role="tablist">${tabs.map(([k, t, n]) => `<button data-act="rtab" data-v="${k}" aria-pressed="${T === k}">${t}${n ? ` (${n})` : ""}</button>`).join("")}</div>
     <section class="card" style="margin-top:14px">${list}</section>`;
@@ -2447,6 +2710,27 @@ function renderModal(){
       <div class="callout small">${ic("shield",22)}<p>We choose the surveyor and rotate them between visits. Your contractor is told a visit is due that week, never the exact day.</p></div>
       <p class="small">Prefer to pick someone yourself? <button class="linkish" data-act="people" data-pid="${p.id}">Choose a surveyor</button></p>
       <div class="btn-row"><button class="btn sign" data-act="confirmBook">Book for ${money(PRICES[M.type])}</button><button class="btn ghost" data-act="close">Cancel</button></div>`;
+  }
+  if(M.kind === "fund"){
+    narrow = true; const p = pById(M.pid), m = mById(M.mid), a = amt(p, m.id), fx = 130, via = M.via || "bank";
+    html = `<h2>Send ${money(a)} to escrow</h2><p class="muted" style="margin-top:4px">${esc(p.name)}: ${m.name}. ${M.need ? "This stage needs its money in escrow before it can be released." : "Held until the stage passes and you approve."}</p>
+      <h3 class="modal-sub">How do you want to send it?</h3>
+      ${[["bank","International bank transfer", `About USD ${Math.round(a / fx).toLocaleString("en-US")} from your bank abroad. Usually 1 to 3 days.`],["kenya","From a Kenyan bank or M-Pesa","For smaller amounts or money already in Kenya."]].map(([k, t, d]) => `<label class="opt"><input type="radio" name="fv" value="${k}" data-field="fundVia" ${via === k ? "checked" : ""}><span><strong>${t}</strong><span class="small muted" style="display:block">${d}</span></span></label>`).join("")}
+      <div class="callout" style="display:block"><p class="small"><strong>Pay to:</strong> Partner Bank Escrow, Macho client funds (sample details)</p>
+        <p class="small"><strong>Reference, so it reaches this project:</strong> <span class="code">${escrowRef(p, m)}</span></p>
+        <p class="tiny muted" style="margin-top:6px">The bank holds this money for this project only. It can go out only to ${esc(p.contractor)}’s checked account, after the stage passes, you approve, and two Macho staff check it.</p></div>
+      <div class="btn-row"><button class="btn sign" data-act="fundArrived">${ic("check",20)} Prototype: the money arrives</button><button class="btn ghost" data-act="close">Later</button></div>`;
+  }
+  if(M.kind === "payee"){
+    narrow = true; const p = pById(M.pid), cur = money0(p).payee;
+    html = `<h2>${cur ? "Change" : "Add"} the account to pay</h2><p class="muted" style="margin-top:4px">${esc(p.name)}. Money from escrow can only ever go to this account.</p>
+      <div class="fields" style="grid-template-columns:1fr">
+        <label class="field">Account name, exactly as the bank has it<input type="text" id="py-name" value="${esc(cur ? cur.name : p.contractor)}"></label>
+        <label class="field">Bank<select id="py-bank">${["KCB","Equity","Co-operative Bank","NCBA","Stanbic","Absa","Standard Chartered","I&M","Family Bank"].map(b => `<option ${cur && cur.bank === b ? "selected" : ""}>${b}</option>`).join("")}</select></label>
+        <label class="field">Account number<input type="text" id="py-acct" inputmode="numeric" placeholder="Full account number"></label></div>
+      <div class="callout small">${ic("shield",22)}<p>We check the name with the bank before any payment. ${cur ? "Because this changes where money goes, we’ll also phone you to confirm. Fraudsters often ask to “update” payment details." : "The name must match the contractor or seller in your agreement."}</p></div>
+      <p id="py-err" class="note" role="alert"></p>
+      <div class="btn-row"><button class="btn sign" data-act="payeeSave">Save account</button><button class="btn ghost" data-act="close">Cancel</button></div>`;
   }
   if(M.kind === "pay"){
     narrow = true;
@@ -2572,7 +2856,9 @@ function renderModal(){
   if(M.kind === "lang"){
     narrow = true; const cur = SET().lang;
     html = `<h2 data-notr>Language · Lugha</h2><p class="muted" style="margin-top:4px" data-notr>Choose the language for the whole app.</p>
-      <div class="langlist" data-notr>${LANGS.map(l => `<button class="langopt" data-act="setLang" data-v="${l.k}" aria-pressed="${cur === l.k}"><strong>${l.native}</strong>${l.native !== l.name ? `<span class="small muted">${l.name}</span>` : ""}${cur === l.k ? ic("check",22) : ""}</button>`).join("")}</div>
+      <div class="langlist" data-notr>${LANGS.slice(0, 2).map(l => `<button class="langopt" data-act="setLang" data-v="${l.k}" aria-pressed="${cur === l.k}"><strong>${l.native}</strong>${l.native !== l.name ? `<span class="small muted">${l.name}</span>` : ""}${cur === l.k ? ic("check",22) : ""}</button>`).join("")}</div>
+      <h3 class="modal-sub" data-notr>More languages (preview)</h3><p class="small muted" data-notr>Machine translated and not yet checked by native speakers.</p>
+      <div class="langlist" data-notr>${LANGS.slice(2).map(l => `<button class="langopt" data-act="setLang" data-v="${l.k}" aria-pressed="${cur === l.k}"><strong>${l.native}</strong>${l.native !== l.name ? `<span class="small muted">${l.name}</span>` : ""}${cur === l.k ? ic("check",22) : ""}</button>`).join("")}</div>
       <div class="callout small" data-notr>${ic("globe",22)}<p>Claude translates the screens the first time you open them in a language, then remembers. Kiswahili is the most accurate. For Gĩkũyũ, Kĩkamba, Kalenjin and the other local languages some words may be wrong, so before launch a native speaker should check every screen.</p></div>`;
   }
   if(M.kind === "account"){
@@ -2615,11 +2901,11 @@ function renderModal(){
     html = `<h2>Start something new</h2>
       <div style="margin-top:12px">${Object.entries(TYPES).map(([k, t]) => `<label class="opt"><input type="radio" name="nt" value="${k}" data-field="npType" ${ty === k ? "checked" : ""}><span>${ic(t.icon,24)}</span><span><strong>${t.label}</strong><span class="small muted" style="display:block">${MS({type:k}).length} steps: ${MS({type:k}).map(m => m.name.toLowerCase()).join(", ")}</span></span></label>`).join("")}</div>
       <div class="fields" style="grid-template-columns:1fr">
-        <label class="field">${Q[0]}<input type="text" id="np-name" placeholder="${Q[1]}"></label>
-        <label class="field">Town or area<input type="text" id="np-town" placeholder="For example, Ruiru"></label>
+        <label class="field">${Q[0]} <span class="req">(required)</span><input type="text" id="np-name" placeholder="${Q[1]}" required aria-required="true"></label>
+        <label class="field">Town or area <span class="req">(required)</span><input type="text" id="np-town" placeholder="For example, Ruiru" required aria-required="true"></label>
         <label class="field">County<select id="np-county">${COUNTIES.concat(["Makueni"]).map(c => `<option>${c}</option>`).join("")}</select></label>
-        <label class="field">${Q[2]}<input type="text" id="np-contractor" placeholder="${Q[3]}"></label>
-        <label class="field">${Q[4]}<input type="number" id="np-budget" inputmode="numeric" min="100000" step="50000" placeholder="For example, 5000000"></label></div>
+        <label class="field">${Q[2]} <span class="req">(required)</span><input type="text" id="np-contractor" placeholder="${Q[3]}" required aria-required="true"></label>
+        <label class="field">${Q[4]} <span class="req">(required)</span><input type="number" id="np-budget" inputmode="numeric" min="100000" step="50000" placeholder="For example, 5000000"></label></div>
       ${ty !== "build" ? `<div class="callout small">${ic("lock",22)}<p>Nothing is paid until the first checks pass. Then ${ty === "land" ? "a 10% deposit after the ground checks, and the balance only once the land is registered in your name" : "a 10% deposit after the inspection, and the balance only once the unit is registered in your name"}.</p></div>` : ""}
       <p id="np-err" class="note" role="alert"></p>
       <div class="btn-row"><button class="btn sign" data-act="createProject">${ic("plus",22)} Add project</button><button class="btn ghost" data-act="close">Cancel</button></div>`;
@@ -2631,6 +2917,51 @@ function renderModal(){
 }
 
 /* ---------- Render ---------- */
+/* Chasers: every waiting step has a deadline, and reminders climb from the app to WhatsApp, SMS and a phone call */
+const LEVEL = { app:"In-app reminder", wa:"WhatsApp", sms:"SMS", call:"Help desk call", flag:"Flagged" };
+function computeChasers(){
+  const out = [], N = NOWMS(), H = 3600000, add = (id, who, level, text, extra) => out.push(Object.assign({ id, who, level, text }, extra || {}));
+  reqs().filter(r => r.status === "pending").forEach(r => { const t = r.sentTs || tsOf(r.sentAt) || N, h = (N - t) / H, x = VERIFIERS[r.sid], p = pById(r.pid); if(!x || !p) return;
+    if(h >= 12) add(`req-${r.id}-12p`, "pro", "sms", `Last reminder: ${OWNER.first}’s request for ${p.town} has waited ${ago(t)}. The client is being offered other professionals.`, { sid:r.sid, age:ago(t), party:x.name });
+    if(h >= 12) add(`req-${r.id}-12`, "client", "flag", `${x.name} hasn’t answered your request for ${p.town} in ${ago(t)}. Choose someone else, or let Macho assign the next free professional.`, { pid:p.id, sid:r.sid, age:ago(t), party:x.name, whoLabel:"Professional, client told" });
+    else if(h >= 6) add(`req-${r.id}-6`, "pro", "wa", `Reminder: ${OWNER.first}’s request for ${p.town} is waiting for your answer.`, { sid:r.sid, age:ago(t), party:x.name });
+    else if(h >= 2) add(`req-${r.id}-2`, "pro", "app", `Reminder: please accept or decline ${OWNER.first}’s request for ${p.town}.`, { sid:r.sid, age:ago(t), party:x.name }); });
+  S.visits.forEach(v => { const p = pById(v.projectId), m = mById(v.milestoneId), x = VERIFIERS[v.verifierId]; if(!p || !m || !x) return;
+    if(v.status === "inprogress"){ const t = v.checkinTs || tsOf(v.checkedInAt) || N, h = (N - t) / H;
+      if(h >= 24) add(`rep-${v.id}-24`, "pro", "call", `Your report for ${m.name.toLowerCase()} at ${p.town} is overdue. The help desk will call you.`, { sid:v.verifierId, age:ago(t), party:x.name });
+      else if(h >= 18) add(`rep-${v.id}-18`, "pro", "wa", `Your report for ${m.name.toLowerCase()} at ${p.town} is due within 6 hours.`, { sid:v.verifierId, age:ago(t), party:x.name }); }
+    if(v.status === "returned"){ const t = v.reviewedTs || tsOf(v.reviewedAt) || N, h = (N - t) / H;
+      if(h >= 24) add(`fixrep-${v.id}-24`, "pro", "call", `The report sent back for ${m.name.toLowerCase()} at ${p.town} still needs fixing. The help desk will call you.`, { sid:v.verifierId, age:ago(t), party:x.name });
+      else if(h >= 12) add(`fixrep-${v.id}-12`, "pro", "wa", `Reminder: fix and resend your report for ${m.name.toLowerCase()} at ${p.town} to get paid.`, { sid:v.verifierId, age:ago(t), party:x.name }); }
+    if(v.status === "submitted"){ const t = v.submittedTs || tsOf(v.submittedAt) || N, h = (N - t) / H;
+      if(h >= 8) add(`rev-${v.id}-8`, "review", "call", `Report for ${m.name.toLowerCase()} at ${p.town} has waited ${ago(t)}. Review desk lead alerted.`, { age:ago(t), party:"Review desk" });
+      else if(h >= 4) add(`rev-${v.id}-4`, "review", "flag", `Report for ${m.name.toLowerCase()} at ${p.town} has waited over 4 working hours.`, { age:ago(t), party:"Review desk" }); } });
+  S.projects.filter(p => !p.closed).forEach(p => { const cur = currentMilestone(p); if(!cur) return; const st = mStatus(p, cur.id), v = onsiteVisit(p, cur.id);
+    if(st === "ready" && v){ const t = v.reviewedTs || tsOf(v.reviewedAt) || N, h = (N - t) / H;
+      if(h >= 120) add(`ready-${v.id}-120`, "client", "call", `The ${cur.name.toLowerCase()} report for ${p.town} has waited ${ago(t)} for your decision. We’ll call you to help.`, { pid:p.id, age:ago(t), party:OWNER.first });
+      else if(h >= 48) add(`ready-${v.id}-48`, "client", "wa", `Reminder: the ${cur.name.toLowerCase()} report for ${p.town} is waiting for your decision.`, { pid:p.id, age:ago(t), party:OWNER.first }); }
+    if(amt(p, cur.id) && !isFunded(p, cur.id) && ["booked","onsite","review","ready","fixed"].includes(st))
+      add(`fund-${p.id}-${cur.id}`, "client", "app", `Send ${money(amt(p, cur.id))} for ${cur.name.toLowerCase()} at ${p.town} to escrow now, so the payment isn’t delayed once the stage passes.`, { pid:p.id, age:"", party:OWNER.first });
+    const f = activeFix(p, cur.id);
+    if(f && f.status === "sent"){ const due = f.dueTs || tsOf(f.due) || N, d = (due - N) / (24 * H);
+      if(d < -1) add(`fix-${f.id}-late`, "client", "flag", `${p.contractor} is past the fix deadline (${f.due}) for ${p.town}. Payment stays held. Book a re-check once they say it’s done, or contact the help desk.`, { pid:p.id, age:ago(due), party:p.contractor });
+      else if(d <= 0) add(`fix-${f.id}-due`, "contractor", "sms", `We reminded ${p.contractor} that the fixes for ${p.town} are due today.`, { pid:p.id, age:"due today", party:p.contractor });
+      else if(d <= 3) add(`fix-${f.id}-3`, "contractor", "sms", `We reminded ${p.contractor} that the fixes for ${p.town} are due on ${f.due}.`, { pid:p.id, age:`due in ${Math.ceil(d)} days`, party:p.contractor }); }
+    Object.entries(money0(p).releases).forEach(([mid, r]) => { const m = mById(mid);
+      if(r.status === "requested" && (N - (r.requestedTs || N)) / H >= 4) add(`rel-${p.id}-${mid}-4`, "finance", "flag", `Release of ${money(amt(p, mid))} for ${m.name.toLowerCase()} at ${p.town} needs its checks (${r.approvals.length} of 2).`, { age:ago(r.requestedTs), party:"Finance" });
+      if(r.status === "sent" && (N - (r.sentTs || N)) / H >= 24) add(`rel-${p.id}-${mid}-bank`, "finance", "call", `The bank hasn’t confirmed ${money(amt(p, mid))} for ${p.town}. Finance is chasing the bank.`, { age:ago(r.sentTs), party:"Partner bank" }); }); });
+  return out;
+}
+/* Send each reminder once, to the right inbox */
+function runChasers(){
+  if(!S || !S.projects) return false;
+  const log = S.chaserLog || (S.chaserLog = {}); let changed = false;
+  computeChasers().forEach(c => { if(log[c.id]) return; log[c.id] = NOWMS(); changed = true;
+    const tag = { chase:true, level:c.level };
+    if(c.who === "pro") proPost(c.sid, c.text, Object.assign({ tab:"jobs" }, tag));
+    else if(c.who === "client" || c.who === "contractor") post("updates", "macho", c.text, Object.assign({ pid:c.pid, read:false }, tag)); });
+  return changed;
+}
 const seenFeed = {};
 function watchProFeed(){
   if(ui.role !== "verifier" || !ui.signedIn) return;
@@ -2643,6 +2974,7 @@ function watchProFeed(){
   seenFeed[sid] = n;
 }
 function render(){
+  if(runChasers()) save();
   setTimeout(watchProFeed, 0);
   if(S.needsFeed){ delete S.needsFeed; seedProFeed(S); save(); }
   mergePros();
@@ -2654,7 +2986,7 @@ function render(){
   const app = document.getElementById("app");
   if(signing){ app.innerHTML = viewSignIn(); renderModal(); return; }
   if(ui.role === "presenter"){ app.innerHTML = viewPresenter(); renderModal(); return; }
-  if(ui.role === "client"){ const p = ui.page === "project" && pById(ui.pid); app.innerHTML = ui.page === "people" ? viewPeople() : ui.page === "messages" ? viewMessages() : ui.page === "help" ? viewHelp() : p ? viewProject(p) : viewHome(); }
+  if(ui.role === "client"){ const p = ui.page === "project" && pById(ui.pid); app.innerHTML = ui.page === "reports" ? viewReports() : ui.page === "people" ? viewPeople() : ui.page === "messages" ? viewMessages() : ui.page === "help" ? viewHelp() : p ? viewProject(p) : viewHome(); }
   else app.innerHTML = ui.role === "verifier" ? viewVerifier() : viewReview();
   renderModal();
 }
@@ -2686,9 +3018,36 @@ const actions = {
     post("updates", "macho", `Macho assigned ${VERIFIERS[v.verifierId].name} for the ${M.type === "onsite" ? mById(M.mid).name.toLowerCase() + " visit" : "video check-in"} at ${p.town} on ${v.scheduled}.`, {pid:p.id, read:true});
     ui.modal = null; commit(`Booked. ${VERIFIERS[v.verifierId].name} will visit on ${v.scheduled}.`); },
   askPay(d){ ui.modal = {kind:"pay", pid:d.pid, mid:d.mid}; renderModal(); },
-  confirmPay(d){ const p = pById(d.pid), m = mById(d.mid), a = amt(p, m.id); p.paid[m.id] = today(); ui.modal = null; ui.shot[p.id] = null;
+  confirmPay(d){ const p = pById(d.pid), m = mById(d.mid), a = amt(p, m.id);
+    if(a && !isFunded(p, m.id)){ ui.modal = { kind:"fund", pid:p.id, mid:m.id, need:true }; renderModal(); return; }
+    if(a && !money0(p).payee){ ui.modal = { kind:"payee", pid:p.id, then:m.id }; renderModal(); return; }
+    if(a){ money0(p).releases[m.id] = { status:"requested", requestedAt:now(), requestedTs:NOWMS(), approvals:[] }; } else p.paid[m.id] = today();
+    ui.modal = null; ui.shot[p.id] = null;
     { const lv = onsiteVisit(p, m.id); if(lv) proPost(lv.verifierId, `${OWNER.first} approved the stage you checked: ${m.name.toLowerCase()} at ${p.town}. Thank you.`, { vid:lv.id }); } post("updates", "macho", a ? `You approved ${money(a)} for ${m.name.toLowerCase()} at ${p.town}.` : `${m.name} at ${p.town} verified.`, {pid:p.id, read:true});
-    commit(a ? `Payment of ${money(a)} approved.` : `${m.name} verified.`); },
+    commit(a ? `Approved. ${money(a)} will be released after Macho’s two-person check.` : `${m.name} verified.`); },
+  fund(d){ ui.modal = { kind:"fund", pid:d.pid, mid:d.mid }; renderModal(); },
+  fundArrived(){ const M = ui.modal, p = pById(M.pid), m = mById(M.mid);
+    money0(p).funded[m.id] = { on:today(), ts:NOWMS(), ref:escrowRef(p, m), via:M.via || "bank" };
+    post("updates", "macho", `${money(amt(p, m.id))} for ${m.name.toLowerCase()} at ${p.town} has arrived in escrow. It’s held until the stage passes and you approve.`, { pid:p.id, read:true });
+    ui.modal = null; commit("Money received and held in escrow.");
+    if(M.need && ["ready"].includes(mStatus(p, m.id))) actions.confirmPay({ pid:p.id, mid:m.id }); },
+  payee(d){ ui.modal = { kind:"payee", pid:d.pid }; renderModal(); },
+  payeeSave(){ const M = ui.modal, p = pById(M.pid), g = id => (document.getElementById(id) || {}).value || "", err = document.getElementById("py-err");
+    const name = g("py-name").trim(), bank = g("py-bank"), acct = g("py-acct").replace(/\D/g, "");
+    if(!name || acct.length < 6){ err.textContent = "Enter the account name and the full account number."; return; }
+    const changing = !!money0(p).payee;
+    money0(p).payee = { name, bank, last4:acct.slice(-4), verifiedAt:today() };
+    const then = M.then; ui.modal = null; if(then){ save(); return actions.confirmPay({ pid:p.id, mid:then }); }
+    commit(changing ? "Account changed. In the live app we call you to confirm before any payment goes to a new account." : "Account added and the name checked with the bank."); },
+  relApprove(d){ const r = relOf(pById(d.pid), d.mid), who = d.who;
+    if(r.approvals.includes(who)) return; r.approvals.push(who);
+    if(r.approvals.length >= 2){ r.status = "sent"; r.sentAt = now(); r.sentTs = NOWMS(); }
+    commit(r.status === "sent" ? "Second check done. Sent to the bank." : `Checked by ${who}. A second person must check it too.`); },
+  relPaid(d){ const p = pById(d.pid), m = mById(d.mid), r = relOf(p, m.id), a = amt(p, m.id);
+    r.status = "paid"; r.paidAt = today(); r.bankRef = "FT" + payRef(p.id + m.id).slice(1, 10); p.paid[m.id] = r.paidAt; ui.shot[p.id] = null;
+    post("updates", "macho", `Paid: ${money(a)} to ${p.contractor} for ${m.name.toLowerCase()} at ${p.town}. Bank reference ${r.bankRef}.`, { pid:p.id, read:false });
+    commit("The bank confirmed the payment."); },
+  clock(d){ S.clockShift = d.v === "0" ? 0 : (S.clockShift || 0) + (+d.v); commit(S.clockShift ? `Demo clock moved forward. Now ${ago(Date.now())} ahead.` : "Demo clock back to now."); },
   siRole(d){ ui.si.role = d.v; ui.si.step = 2; ui.si.cc = d.v === "client" ? "+1" : "+254"; ui.si.phone = ""; render(); },
   siBack(){ const si = ui.si; si.step = si.step === 4 ? 1 : si.step - 1; si.demoCode = null; render(); },
   siSample(){ const si = ui.si, n = si.role === "client" ? DEMO_PHONES.client : si.role === "review" ? DEMO_PHONES.review : VERIFIERS.v1.phone;
@@ -2738,6 +3097,8 @@ const actions = {
   freshLocal(){ S = seed(); save(); ui.page = "home"; toast("Fresh sample data loaded on this device."); render(); },
   newProject(d){ ui.modal = {kind:"newProject", type:(d && d.type) || "build"}; renderModal(); },
   hf(d){ ui.hf = d.v; render(); },
+  reports(){ ui.role = "client"; ui.page = "reports"; ui.modal = null; render(); window.scrollTo(0, 0); },
+  dismissMsgs(d){ ui.dismissedMsgs = +d.v; keepScroll(render); },
   toggleClosed(){ ui.showClosed = !ui.showClosed; keepScroll(render); },
   closeProj(d){ ui.modal = {kind:"closeProj", pid:d.pid}; renderModal(); },
   closeWhy(d){ ui.modal.why = d.v; renderModal(); },
@@ -2813,7 +3174,7 @@ const actions = {
   rqContact(d){ ui.modal.contact = d.v; renderModal(); },
   sendReq(){ const M = ui.modal, x = VERIFIERS[M.sid], p = pById(M.pid), cur = currentMilestone(p);
     const rid = "req-" + (S.nextId++);
-    reqs().push({ id:rid, sid:M.sid, pid:p.id, mid:cur.id, type:M.type, date:M.date, time:M.time, contact:M.contact, note:M.note || "", status:"pending", sentAt:today() });
+    reqs().push({ id:rid, sid:M.sid, pid:p.id, mid:cur.id, type:M.type, date:M.date, time:M.time, contact:M.contact, note:M.note || "", status:"pending", sentAt:today(), sentTs:NOWMS() });
     proPost(M.sid, `New request from ${OWNER.first}: ${M.type === "onsite" ? cur.name.toLowerCase() + " visit" : "video check-in"} at ${p.town}, ${M.date}, ${M.time}. Accept or decline it in Jobs.`, { tab:"jobs" });
     post(rid, "client", `Hello ${x.name.split(" ")[0]}. Could you do the ${M.type === "onsite" ? cur.name.toLowerCase() + " visit" : "video check-in"} for my ${p.name.toLowerCase()} in ${p.town} on ${M.date}, ${M.time}?${M.note ? " " + M.note : ""}`);
     ui.modal = null; commit(`Request sent to ${x.name}. ${x.reply}.`); window.scrollTo(0, 0); },
@@ -2859,7 +3220,7 @@ const actions = {
   contact(d){ const x = VERIFIERS[d.sid]; toast(`In the live app this opens ${d.how === "call" ? "a call" : d.how} with ${x.name} through a Macho number, so both numbers stay private.`); },
   fixList(d){ ui.modal = {kind:"fix", pid:d.pid, mid:d.mid}; renderModal(); },
   sendFix(){ const M = ui.modal, p = pById(M.pid), v = onsiteVisit(p, M.mid), x = new Date(); x.setDate(x.getDate() + (+M.due));
-    fx(p).push({ id:"fix-" + (S.nextId++), mid:M.mid, vid:v.id, items:M.items.slice(), note:M.note || "", due:x.toLocaleDateString("en-GB", {day:"numeric", month:"short", year:"numeric"}), sentAt:today(), status:"sent" });
+    fx(p).push({ id:"fix-" + (S.nextId++), mid:M.mid, vid:v.id, items:M.items.slice(), note:M.note || "", due:x.toLocaleDateString("en-GB", {day:"numeric", month:"short", year:"numeric"}), dueTs:x.getTime(), sentAt:today(), sentTs:NOWMS(), status:"sent" });
     proPost(v.verifierId, `${OWNER.first} used your report to hold the payment for ${mById(M.mid).name.toLowerCase()} at ${p.town} and send the ${TYPES[ptype(p)].payee} a fix list.`, { vid:v.id });
     post("updates", "macho", `Payment on hold for ${mById(M.mid).name.toLowerCase()} at ${p.town}. Fix list sent to ${p.contractor}.`, {pid:p.id, read:true});
     ui.modal = null; ui.shot[p.id] = null; commit(`Payment on hold. Fix list sent to ${p.contractor}.`); },
@@ -2880,7 +3241,7 @@ const actions = {
   scrim(d, el, e){ if(e.target === el){ ui.modal = null; renderModal(); } },
   openJob(d){ ui.vVisit = d.vid; render(); window.scrollTo(0, 0); },
   backJobs(){ ui.vVisit = null; render(); window.scrollTo(0, 0); },
-  checkin(d){ const v = vById(d.vid); v.status = "inprogress"; v.checkedInAt = now(); const p = pById(v.projectId);
+  checkin(d){ const v = vById(d.vid); v.status = "inprogress"; v.checkedInAt = now(); v.checkinTs = NOWMS(); const p = pById(v.projectId);
     post(v.requestId ? reqThread({id:v.requestId}) : "updates", "system", `${VERIFIERS[v.verifierId].name} checked in at ${p.town}.`); commit("Checked in."); },
   mark(d){ const v = vById(d.vid); v.checklist[d.item] = d.val; if(d.val !== "fail"){ delete v.reasons[d.item]; delete ip(v)[d.item]; } save(); keepScroll(render); },
   sampleIssue(d){ const v = vById(d.vid); ip(v)[d.item] = {kind:"demo", art:d.art, stage:+d.stage, defect:true, stamp:`${now()}\n${SITE[v.projectId] || ""}`}; save(); keepScroll(render); },
@@ -2888,7 +3249,7 @@ const actions = {
   reason(d){ const v = vById(d.vid), list = v.reasons[d.item] || (v.reasons[d.item] = []), i = list.indexOf(d.r); if(i >= 0) list.splice(i, 1); else list.push(d.r); save(); keepScroll(render); },
   sample(d){ const v = vById(d.vid); v.photos[d.spot] = {kind:"demo", art:d.art, stage:+d.stage, stamp:`${now()}\n${SITE[v.projectId] || ""}`}; save(); keepScroll(render); },
   retake(d){ const v = vById(d.vid); delete v.photos[d.spot]; save(); keepScroll(render); },
-  submit(d){ const v = vById(d.vid); if(missing(v).length) return; v.status = "submitted"; v.submittedAt = now(); ui.vVisit = null;
+  submit(d){ const v = vById(d.vid); if(missing(v).length) return; v.status = "submitted"; v.submittedAt = now(); v.submittedTs = NOWMS(); ui.vVisit = null;
     post(v.requestId ? reqThread({id:v.requestId}) : "updates", "system", `${VERIFIERS[v.verifierId].name} finished the visit. The report is with our review desk.`); commit("Sent to the review desk."); window.scrollTo(0, 0); },
   apApprove(d){ const a = apps().find(x => x.id === d.id); a.status = "approved"; a.decidedAt = now();
     const id = "vx" + (S.nextId++), fee = { "Advocate":12000, "Licensed land surveyor":15000, "Registered valuer":13000, "Structural engineer":12000, "Civil engineer":9000 }[a.role] || 7500;
@@ -2907,7 +3268,7 @@ const actions = {
     due.forEach(v => { v.payout = { status:"paid", on:today(), ref:payRef(v.id + today()), method:"M-Pesa" };
       proPost(v.verifierId, `Paid ${money(netOf(v))} by M-Pesa for ${mById(v.milestoneId).name.toLowerCase()} at ${pById(v.projectId).town}. Ref. ${v.payout.ref}.`, { tab:"earnings" }); });
     commit(due.length ? `Paid ${due.length} ${due.length > 1 ? "professionals’ fees" : "professional’s fee"} by M-Pesa.` : "Nothing waiting to be paid."); },
-  approve(d){ const v = vById(d.vid); v.status = "approved"; v.reviewNote = (v.reviewNoteDraft || "").trim(); v.reviewNoteDraft = ""; v.reviewedAt = now(); v.reviewer = REVIEWER; ui.rVisit = null;
+  approve(d){ const v = vById(d.vid); v.status = "approved"; v.reviewNote = (v.reviewNoteDraft || "").trim(); v.reviewNoteDraft = ""; v.reviewedAt = now(); v.reviewedTs = NOWMS(); v.reviewer = REVIEWER; ui.rVisit = null;
     v.history = (v.history || []).concat([{ at:now(), by:REVIEWER, outcome:"approved", note:v.reviewNote }]);
     v.quality = Object.fromEntries(QUAL.map(([k]) => [k, !(ui.rq && ui.rq[k] === false)])); ui.rq = null;
     v.payout = { status:"processing", due:nextPayDay() };
@@ -2920,7 +3281,7 @@ const actions = {
     commit("Approved. The client can now read the report."); },
   sendBack(d){ const v = vById(d.vid), note = (v.reviewNoteDraft || "").trim();
     if(!note){ toast("Add a note telling the surveyor what to fix."); return; }
-    v.status = "returned"; v.reviewNote = note; v.reviewNoteDraft = ""; v.reviewedAt = now(); ui.rVisit = null; ui.rq = null;
+    v.status = "returned"; v.reviewNote = note; v.reviewNoteDraft = ""; v.reviewedAt = now(); v.reviewedTs = NOWMS(); ui.rVisit = null; ui.rq = null;
     v.history = (v.history || []).concat([{ at:now(), by:REVIEWER, outcome:"returned", note }]);
     proPost(v.verifierId, `Your report for ${mById(v.milestoneId).name.toLowerCase()} at ${pById(v.projectId).town} was sent back: ${note} Fix it and resend to get paid.`, { tab:"jobs" });
     commit("Sent back to the professional."); },
@@ -2959,6 +3320,7 @@ document.addEventListener("change", async e => {
   else if(f === "bookType"){ ui.modal.type = t.value; renderModal(); }
   else if(f === "fixItem"){ const l = ui.modal.items, i = l.indexOf(t.value); if(t.checked && i < 0) l.push(t.value); if(!t.checked && i >= 0) l.splice(i, 1); renderModal(); }
   else if(f === "fixDue"){ ui.modal.due = +t.value; renderModal(); }
+  else if(f === "fundVia"){ ui.modal.via = t.value; renderModal(); }
   else if(f === "fFavs"){ ui.f.favs = t.value === "1"; render(); }
   else if(f === "proAlert"){ const sid = ui.signedIn, ed = (S.proEdits || (S.proEdits = {})), e = ed[sid] || (ed[sid] = {}); e.notify = Object.assign({ wa:proAlert(sid, "wa"), sms:proAlert(sid, "sms") }, e.notify || {}); e.notify[t.dataset.k] = t.checked; save(); toast(t.checked ? "Alerts on." : "Alerts off."); }
   else if(f === "phoneAlerts"){
