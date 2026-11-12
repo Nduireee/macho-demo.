@@ -682,6 +682,7 @@ body{overflow-x:hidden}
 .kpis{grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr))}
 @media (max-width:420px){ .estats{grid-template-columns:1fr} .pstats{grid-template-columns:1fr 1fr} }
 .card.pcard{padding:0}
+.offernote{color:var(--ink);font-weight:700;background:var(--soft);padding:6px 10px;border-radius:6px}
 
 .linkbox{min-width:min(520px,62vw)}
 .sync{font-weight:700;padding:2px 10px;border-radius:12px;background:rgba(255,255,255,.12)}
@@ -1098,7 +1099,7 @@ function seedBase(){
   };
 }
 
-const PRO_SHARE = 0.8;
+const PRO_SHARE = 0.7;
 const PAY_DAY = "Friday";
 function addDays(dateStr, n){ const d = new Date(Date.parse(String(dateStr).split(",")[0])); if(isNaN(d)) return dateStr; d.setDate(d.getDate() + n); return d.toLocaleDateString("en-GB", {day:"numeric", month:"short", year:"numeric"}); }
 function nextPayDay(){ const d = new Date(); const add = (5 - d.getDay() + 7) % 7 || 7; d.setDate(d.getDate() + add); return d.toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short", year:"numeric"}); }
@@ -1374,12 +1375,25 @@ function band(v){
 }
 const released = p => MS(p).filter(m => p.paid[m.id]).reduce((a, m) => a + amt(p, m.id), 0);
 function prevVerifier(v){ const list = S.visits.filter(x => x.projectId === v.projectId); const i = list.indexOf(v); return i > 0 ? list[i-1].verifierId : null; }
-function assignVerifier(p, mid){
+function assignVerifier(p, mid, skip){
   const last = lastSurveyor(p), c = p.county.replace(" County", ""), st = mById(mid || (currentMilestone(p) || {}).id) || MILESTONES[0];
-  const fit = Object.keys(VERIFIERS).filter(id => st.roles.includes(VERIFIERS[id].role) && !isAway(id));
+  const fit = Object.keys(VERIFIERS).filter(id => st.roles.includes(VERIFIERS[id].role) && !isAway(id) && !(skip || []).includes(id));
+  if(!fit.length) return null;
   const local = fit.filter(id => id !== last && VERIFIERS[id].counties.includes(c));
   const pool = local.length ? local : fit.filter(id => id !== last).length ? fit.filter(id => id !== last) : fit;
   return pool[(pVisits(p).length) % pool.length]; }
+/* Macho offers a job to the next suitable professional. It lands in their inbox and Jobs; it becomes a visit only when they accept. */
+function machoOffer(p, mid, type, date, time, skip){
+  const sid = assignVerifier(p, mid, skip), m = mById(mid), what = type === "onsite" ? m.name.toLowerCase() + " visit" : "video check-in";
+  if(!sid){ post("updates", "macho", `We couldn’t find a free professional for the ${what} at ${p.town}. Please choose one from Find a professional, or ask the help desk.`, { pid:p.id, read:false }); return null; }
+  const rid = "req-" + (S.nextId++);
+  const r = { id:rid, sid, pid:p.id, mid, type, date, time, contact:"app", note:"", status:"pending", sentAt:today(), sentTs:NOWMS(), viaMacho:true, skip:(skip || []).slice() };
+  reqs().push(r);
+  post(rid, "system", `Macho offered this ${what} to ${VERIFIERS[sid].name}, because ${OWNER.first} asked Macho to choose. Waiting for them to accept.`);
+  proPost(sid, `New job offer from Macho: ${what} at ${p.town}, ${date}, ${time}. ${OWNER.first} asked Macho to choose a professional and you’re next. Accept or decline it in Jobs.`, { tab:"jobs" });
+  post("updates", "macho", `We offered the ${what} at ${p.town} on ${date}, ${time} to ${VERIFIERS[sid].name}. It’s booked once they accept.`, { pid:p.id, read:true });
+  return r;
+}
 function visitStateText(v){ return {assigned:`Booked for ${v.scheduled}`, inprogress:"Surveyor on site now", returned:"Being corrected by the surveyor", submitted:"Being checked by our review desk", approved:"Report ready"}[v.status]; }
 function bookingDates(){ const out = [], d = new Date();
   while(out.length < 6){ d.setDate(d.getDate() + 1); if(d.getDay() === 0) continue; out.push(d.toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short", year:"numeric"})); }
@@ -1885,7 +1899,7 @@ function threads(){
   const lastIdx = t => { let k = -1; msgs().forEach((m, i) => { if(m.thread === t.id) k = i; }); return k; };
   return out.filter(t => lastIdx(t) >= 0).sort((a, b) => lastIdx(b) - lastIdx(a));
 }
-const STATUS_PILL = { pending:`<span class="pill wait">Waiting for reply</span>`, accepted:`<span class="pill pass">Accepted</span>`, declined:`<span class="pill issue">Declined</span>`, cancelled:`<span class="pill">Cancelled</span>`, updates:`<span class="pill">Project updates</span>` };
+const STATUS_PILL = { expired:`<span class="pill">Expired</span>`, pending:`<span class="pill wait">Waiting for reply</span>`, accepted:`<span class="pill pass">Accepted</span>`, declined:`<span class="pill issue">Declined</span>`, cancelled:`<span class="pill">Cancelled</span>`, updates:`<span class="pill">Project updates</span>` };
 function threadTitle(t){ return t.kind === "updates" ? "Macho updates" : VERIFIERS[t.sid].name; }
 function threadSub(t){ if(t.kind === "updates") return "Reports, payments and visits across your projects";
   const p = pById(t.r.pid), m = mById(t.r.mid); return `${esc(p.name)}, ${t.r.type === "onsite" ? m.name.toLowerCase() + " visit" : "video check-in"}`; }
@@ -2134,7 +2148,7 @@ function nextHTML(p){
   let h = "";
   const pr = (st === "upcoming" || st === "fixed") && pendingReq(p, cur.id), dec = (st === "upcoming" || st === "fixed") && lastDeclined(p, cur.id);
   if(pr){ const x = VERIFIERS[pr.sid];
-    h = `<h2>${ic("clock",30)} Waiting for ${x.name} to accept</h2><div class="r-main" style="margin:6px 0 4px">${avatar(pr.sid, 48)}<p>You asked ${x.name.split(" ")[0]} for the ${cur.name.toLowerCase()} visit on ${pr.date}, ${pr.time}. ${x.reply}.</p></div>
+    h = `<h2>${ic("clock",30)} Waiting for ${x.name} to accept</h2><div class="r-main" style="margin:6px 0 4px">${avatar(pr.sid, 48)}<p>${pr.viaMacho ? `Macho offered the ${cur.name.toLowerCase()} visit on ${pr.date}, ${pr.time} to ${x.name.split(" ")[0]}. If ${x.name.split(" ")[0]} can’t take it, we’ll offer it to the next professional automatically.` : `You asked ${x.name.split(" ")[0]} for the ${cur.name.toLowerCase()} visit on ${pr.date}, ${pr.time}.`} ${x.reply}.</p></div>
       <div class="btn-row"><button class="btn ghost" data-act="cancelReq" data-rid="${pr.id}">Cancel request</button>
       <button class="btn" data-act="openSurveyorApp" data-sid="${pr.sid}">${ic("hardhat",20)} Prototype: see it in ${x.name.split(" ")[0]}’s app</button></div>`; }
   else if(st === "upcoming") h = `<h2>${ic("calendar",30)} Next: ${cur.name}</h2>
@@ -2239,8 +2253,9 @@ function jobsHTML(){
   const reqCard = r => { const p = pById(r.pid), m = mById(r.mid), fee = r.type === "onsite" ? me.fee : me.video, dec = ui.declining === r.id;
     const how = {whatsapp:"WhatsApp", call:"a phone call", email:"email", app:"messages in the app only"}[r.contact];
     return `<article class="block reqcard">
-      <div class="req-head"><span class="pill wait">New request</span><span class="small muted">Sent ${r.sentAt}</span></div>
+      <div class="req-head"><span class="pill wait">${r.viaMacho ? "New job offer" : "New request"}</span><span class="small muted">Sent ${r.sentAt}</span></div>
       <h2 style="margin-top:8px">${r.type === "onsite" ? (activeFix(p, r.mid) ? "Re-check after fixes: " : "Stage visit: ") + m.name : "Video check-in: " + m.name}</h2>
+      ${r.viaMacho ? `<p class="small offernote">${ic("hardhat",16)} Offered by Macho: the client asked Macho to choose a professional, and you’re next.</p>` : ""}
       ${isClientFav(ui.signedIn) ? `<p class="small favnote">${ic("heart",16)} You’re one of ${OWNER.first}’s favourite professionals.</p>` : ""}
       <p class="small">From <strong>${OWNER.first}</strong>, living in ${OWNER.city || "Houston"}. ${esc(p.name)}.</p>
       <dl class="req-facts">
@@ -2707,7 +2722,7 @@ function renderModal(){
         <span>${ic("video",24)}</span><span><strong>Video check-in, ${money(PRICES.video)}</strong><span class="small muted">A quick live look between stages. It can’t release a payment.</span></span></label>
       <div class="fields"><label class="field">Day<select data-field="bookDate">${dates.map(d => `<option ${d === M.date ? "selected" : ""}>${d}</option>`).join("")}</select></label>
         <label class="field">Time<select data-field="bookTime">${["09:00","11:00","14:00","16:00"].map(t => `<option ${t === M.time ? "selected" : ""}>${t}</option>`).join("")}</select></label></div>
-      <div class="callout small">${ic("shield",22)}<p>We choose the surveyor and rotate them between visits. Your contractor is told a visit is due that week, never the exact day.</p></div>
+      <div class="callout small">${ic("shield",22)}<p>We offer the visit to the next suitable professional. It’s booked once they accept, usually within a few hours; if they can’t, we offer it to the next one. We rotate professionals between visits. Your contractor is told a visit is due that week, never the exact day.</p></div>
       <p class="small">Prefer to pick someone yourself? <button class="linkish" data-act="people" data-pid="${p.id}">Choose a surveyor</button></p>
       <div class="btn-row"><button class="btn sign" data-act="confirmBook">Book for ${money(PRICES[M.type])}</button><button class="btn ghost" data-act="close">Cancel</button></div>`;
   }
@@ -2923,6 +2938,7 @@ function computeChasers(){
   const out = [], N = NOWMS(), H = 3600000, add = (id, who, level, text, extra) => out.push(Object.assign({ id, who, level, text }, extra || {}));
   reqs().filter(r => r.status === "pending").forEach(r => { const t = r.sentTs || tsOf(r.sentAt) || N, h = (N - t) / H, x = VERIFIERS[r.sid], p = pById(r.pid); if(!x || !p) return;
     if(h >= 12) add(`req-${r.id}-12p`, "pro", "sms", `Last reminder: ${OWNER.first}’s request for ${p.town} has waited ${ago(t)}. The client is being offered other professionals.`, { sid:r.sid, age:ago(t), party:x.name });
+    if(h >= 12 && r.viaMacho){ add(`req-${r.id}-12m`, "macho", "flag", `${x.name} didn’t answer within 12 hours, so the offer for ${p.town} moved to the next professional.`, { pid:p.id, sid:r.sid, rid:r.id, age:ago(t), party:x.name, whoLabel:"Professional, re-offered" }); return; }
     if(h >= 12) add(`req-${r.id}-12`, "client", "flag", `${x.name} hasn’t answered your request for ${p.town} in ${ago(t)}. Choose someone else, or let Macho assign the next free professional.`, { pid:p.id, sid:r.sid, age:ago(t), party:x.name, whoLabel:"Professional, client told" });
     else if(h >= 6) add(`req-${r.id}-6`, "pro", "wa", `Reminder: ${OWNER.first}’s request for ${p.town} is waiting for your answer.`, { sid:r.sid, age:ago(t), party:x.name });
     else if(h >= 2) add(`req-${r.id}-2`, "pro", "app", `Reminder: please accept or decline ${OWNER.first}’s request for ${p.town}.`, { sid:r.sid, age:ago(t), party:x.name }); });
@@ -2958,6 +2974,12 @@ function runChasers(){
   const log = S.chaserLog || (S.chaserLog = {}); let changed = false;
   computeChasers().forEach(c => { if(log[c.id]) return; log[c.id] = NOWMS(); changed = true;
     const tag = { chase:true, level:c.level };
+    if(c.who === "macho"){ const r = reqs().find(x => x.id === c.rid), p = r && pById(r.pid);
+      if(r && p && r.status === "pending"){ r.status = "expired"; r.seen = true; post(reqThread(r), "system", "This offer expired after 12 hours without an answer.");
+        proPost(r.sid, `The job offer for ${p.town} expired because it wasn’t answered within 12 hours.`, { tab:"jobs" });
+        const next = machoOffer(p, r.mid, r.type, r.date, r.time, (r.skip || []).concat([r.sid]));
+        if(next) post("updates", "macho", `${VERIFIERS[r.sid].name} didn’t answer in time, so we offered the visit at ${p.town} to ${VERIFIERS[next.sid].name}.`, { pid:p.id, read:false }); }
+      return; }
     if(c.who === "pro") proPost(c.sid, c.text, Object.assign({ tab:"jobs" }, tag));
     else if(c.who === "client" || c.who === "contractor") post("updates", "macho", c.text, Object.assign({ pid:c.pid, read:false }, tag)); });
   return changed;
@@ -3009,14 +3031,10 @@ const actions = {
   openReport(d){ ui.modal = {kind:"report", vid:d.vid}; renderModal(); },
   book(d){ ui.modal = {kind:"book", pid:d.pid, mid:d.mid, type:d.type || "onsite", time:"09:00"}; renderModal(); },
   confirmBook(){ const M = ui.modal, p = pById(M.pid);
-    const v = { id:"visit-" + (S.nextId++), projectId:p.id, milestoneId:M.mid, type:M.type, verifierId:assignVerifier(p, M.mid), scheduled:`${M.date}, ${M.time}`,
-      status:"assigned", checklist:{}, reasons:{}, other:{}, photos:{}, issuePhotos:{}, progress:0, summary:"", fee:PRICES[M.type] };
-    const af = activeFix(p, M.mid);
-    if(af && af.status === "fixed" && M.type === "onsite"){ af.status = "recheck"; v.recheck = true; v.fixOf = af.id; }
-    S.visits.push(v); reqs().forEach(r => { if(r.pid === p.id && r.mid === M.mid && r.status === "declined") r.seen = true; });
-    proPost(v.verifierId, `Macho has booked you for the ${M.type === "onsite" ? mById(M.mid).name.toLowerCase() + " visit" : "video check-in"} at ${p.town} on ${v.scheduled}. It’s in Jobs.`, { tab:"jobs" });
-    post("updates", "macho", `Macho assigned ${VERIFIERS[v.verifierId].name} for the ${M.type === "onsite" ? mById(M.mid).name.toLowerCase() + " visit" : "video check-in"} at ${p.town} on ${v.scheduled}.`, {pid:p.id, read:true});
-    ui.modal = null; commit(`Booked. ${VERIFIERS[v.verifierId].name} will visit on ${v.scheduled}.`); },
+    reqs().forEach(r => { if(r.pid === p.id && r.mid === M.mid && r.status === "declined") r.seen = true; });
+    const r = machoOffer(p, M.mid, M.type, M.date, M.time, []);
+    ui.modal = null;
+    commit(r ? `Offered to ${VERIFIERS[r.sid].name}. It’s booked as soon as they accept, usually within a few hours.` : "No professional is free for this right now. Please choose one yourself."); },
   askPay(d){ ui.modal = {kind:"pay", pid:d.pid, mid:d.mid}; renderModal(); },
   confirmPay(d){ const p = pById(d.pid), m = mById(d.mid), a = amt(p, m.id);
     if(a && !isFunded(p, m.id)){ ui.modal = { kind:"fund", pid:p.id, mid:m.id, need:true }; renderModal(); return; }
@@ -3181,6 +3199,7 @@ const actions = {
   cancelReq(d){ const r = reqs().find(x => x.id === d.rid); r.status = "cancelled"; post(reqThread(r), "system", "The client cancelled this request.");
     proPost(r.sid, `${OWNER.first} cancelled the request for ${pById(r.pid).town} on ${r.date}. No action needed.`); commit("Request cancelled."); },
   acceptReq(d){ const r = reqs().find(x => x.id === d.rid), p = pById(r.pid);
+    if(!r || r.status !== "pending"){ toast("This request is no longer open."); render(); return; }
     const v = { id:"visit-" + (S.nextId++), projectId:p.id, milestoneId:r.mid, type:r.type, verifierId:r.sid, scheduled:`${r.date}, ${r.time}`, requestId:r.id,
       status:"assigned", checklist:{}, reasons:{}, other:{}, photos:{}, issuePhotos:{}, progress:0, summary:"", fee:r.type === "onsite" ? VERIFIERS[r.sid].fee : VERIFIERS[r.sid].video };
     const af = activeFix(p, r.mid); if(af && af.status === "fixed" && r.type === "onsite"){ af.status = "recheck"; v.recheck = true; v.fixOf = af.id; }
@@ -3189,7 +3208,12 @@ const actions = {
   declineStart(d){ ui.declining = d.rid; keepScroll(render); },
   declineCancel(){ ui.declining = null; keepScroll(render); },
   declineWhy(d){ const r = reqs().find(x => x.id === d.rid); r.why = d.t; keepScroll(render); },
-  declineReq(d){ const r = reqs().find(x => x.id === d.rid); if(!r.why) return; r.status = "declined"; ui.declining = null; post(reqThread(r), "surveyor", `Sorry ${OWNER.first}, I can’t take this one. Reason: ${r.why.toLowerCase()}.`); commit("Declined. The client will be asked to choose someone else."); },
+  declineReq(d){ const r = reqs().find(x => x.id === d.rid); if(!r.why) return; r.status = "declined"; ui.declining = null;
+    post(reqThread(r), "surveyor", `Sorry ${OWNER.first}, I can’t take this one. Reason: ${r.why.toLowerCase()}.`);
+    if(r.viaMacho){ r.seen = true; const p = pById(r.pid), next = machoOffer(p, r.mid, r.type, r.date, r.time, (r.skip || []).concat([r.sid]));
+      if(next) post("updates", "macho", `${VERIFIERS[r.sid].name} couldn’t take the visit at ${p.town}, so we offered it to ${VERIFIERS[next.sid].name}.`, { pid:p.id, read:false });
+      commit("Declined. Macho has offered the job to the next professional."); return; }
+    commit("Declined. The client will be asked to choose someone else."); },
   toggleFav(d){ const l = favs(), i = l.indexOf(d.sid); if(i >= 0) l.splice(i, 1); else l.push(d.sid); save(); keepScroll(render); if(ui.modal) renderModal();
     toast(i >= 0 ? `${VERIFIERS[d.sid].name} removed from your favourites.` : `${VERIFIERS[d.sid].name} added to your favourites.`); },
   quickReply(d){ post(d.t, "surveyor", d.v); save(); render(); scrollMsgs(); },
