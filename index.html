@@ -707,6 +707,7 @@ body{overflow-x:hidden}
 .brk{max-height:52vh;overflow:auto;margin-top:12px}
 .brk tfoot td{border-top:2px solid var(--line);position:sticky;bottom:0;background:var(--surface)}
 .brk thead th{position:sticky;top:0;background:var(--surface)}
+.mcode{width:100%;font-family:ui-monospace,Menlo,Consolas,monospace !important;font-size:.85rem !important;white-space:pre;overflow:auto;margin-top:10px}
 
 .linkbox{min-width:min(520px,62vw)}
 .sync{font-weight:700;padding:2px 10px;border-radius:12px;background:rgba(255,255,255,.12)}
@@ -1184,6 +1185,7 @@ let ui = { role:"client", page:"home", pid:null, shot:{}, modal:null, signedIn:"
 let warned = false;
 function load(){ try{ const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
 function save(){
+  try{ S.ownerExport = buildExport(); }catch(e){}
   try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ if(!warned && !SYNC.on){ warned = true; toast("Your photos are too large to keep after a reload, but this session works."); } }
   if(SYNC.on) pushSoon();
 }
@@ -1822,6 +1824,43 @@ function ownerCalc(per){
   const grossFees = sum("fee-in"), proShare = grossFees - commission, gross = grossFees + escrowFees;
   return { per, nowD, all, L, sum, commission, escrowFees, hosting, hostMonths, costs, revenue, net, held, owed, grossFees, proShare, gross };
 }
+function excelQuery(which){
+  const url = `${CFG.supabaseUrl || "https://YOUR-PROJECT.supabase.co"}/rest/v1/demo_state?id=eq.${ROOM}&select=data`;
+  const head = `let
+    Source = Json.Document(Web.Contents("${url}", [Headers=[apikey="${CFG.supabaseKey || "YOUR-PUBLISHABLE-KEY"}"]])),
+    Export = Source{0}[data][ownerExport],`;
+  return which === "snapshot" ? `${head}
+    Snapshot = Record.ToTable(Export[snapshot]),
+    Updated = Table.InsertRows(Snapshot, 0, {[Name = "updated_at", Value = Export[updated_at]]})
+in
+    Updated` : `${head}
+    Monthly = Table.FromRecords(Export[monthly]),
+    Typed = Table.TransformColumnTypes(Monthly, List.Transform(List.RemoveItems(Table.ColumnNames(Monthly), {"month"}), each {_, type number}))
+in
+    Typed`;
+}
+function buildExport(){
+  const all = ledger(), byM = {}, key = e => { const d = new Date(e.ts || NOWMS()); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`; };
+  const blank = () => ({ visit_fees_paid_by_clients:0, paid_or_owed_to_professionals:0, macho_commission:0, escrow_fees:0, money_into_escrow:0, released_from_escrow:0, costs_excl_hosting:0, visits_approved:0, payouts_to_professionals:0 });
+  all.forEach(e => { const m = byM[key(e)] || (byM[key(e)] = blank());
+    if(e.bucket === "fee-in"){ m.visit_fees_paid_by_clients += e.amount; m.visits_approved++; }
+    if(e.bucket === "rev-commission") m.macho_commission += e.amount;
+    if(e.bucket === "rev-escrow") m.escrow_fees += e.amount;
+    if(e.bucket === "escrow-in") m.money_into_escrow += e.amount;
+    if(e.bucket === "escrow-out") m.released_from_escrow += e.amount;
+    if(e.bucket === "payout") m.payouts_to_professionals += e.amount;
+    if(e.bucket === "cost") m.costs_excl_hosting += e.amount; });
+  const monthly = Object.keys(byM).sort().map(k => { const m = byM[k];
+    m.paid_or_owed_to_professionals = m.visit_fees_paid_by_clients - m.macho_commission;
+    const hosting = OC().hostingKsh, income = m.macho_commission + m.escrow_fees, costs = m.costs_excl_hosting + hosting;
+    return Object.assign({ month:k }, m, { hosting_and_tools:hosting, macho_income:income, total_costs:costs, net_income:income - costs }); });
+  const appr = S.visits.filter(v => v.status === "approved");
+  return { updated_at:new Date(NOWMS()).toISOString(), currency:"KES", monthly,
+    snapshot:{ escrow_held_now:S.projects.reduce((t, p) => t + moneySummary(p).held, 0), owed_to_professionals_now:all.filter(e => e.bucket === "owed").reduce((t, e) => t + e.amount, 0),
+      active_projects:S.projects.filter(p => !p.closed && currentMilestone(p)).length, completed_projects:S.projects.filter(p => !currentMilestone(p)).length,
+      active_professionals:new Set(appr.map(v => v.verifierId)).size, average_visit_fee:appr.length ? Math.round(appr.reduce((t, v) => t + feeOf(v), 0) / appr.length) : 0,
+      professionals_share:PRO_SHARE, escrow_fee_rate:ESCROW_FEE, bank_escrow_charge_rate:BANK_FEE } };
+}
 function viewOwner(){
   const per = ui.oPeriod || "all", C = ownerCalc(per);
   const { nowD, all, L, commission, escrowFees, costs, net, held, owed, gross, grossFees, proShare } = C;
@@ -1870,6 +1909,18 @@ function viewOwner(){
       ${L.length > 25 && !ui.oAll ? `<div class="btn-row"><button class="btn ghost small-btn" data-act="oAll">Show all ${L.length}</button></div>` : ""}</section>
     <section class="card" style="margin-top:20px"><h2>${ic("pencil",24)} Cost assumptions</h2><p class="small muted">Real costs come from your provider invoices once you’re live. Until then, these estimates are used.</p>
       <div class="fields">${[["cardPct","Card and M-Pesa charge on visit fees (%)"],["payoutKsh","M-Pesa charge per payout (KSh)"],["smsKsh","Cost per text or WhatsApp message (KSh)"],["kycKsh","Cost per professional ID check (KSh)"],["hostingKsh","Hosting and tools per month (KSh)"]].map(([k, t]) => `<label class="field">${t}<input type="number" step="any" min="0" data-field="oc" data-k="${k}" value="${OC()[k]}"></label>`).join("")}</div></section>
+    <section class="card" style="margin-top:20px"><h2>${ic("download",24)} Connect your Excel model</h2>
+      <p>Your Excel file can read the app’s actual figures and refresh them every time you open it. Excel reads; it never changes anything in the app.</p>
+      ${SYNC.on || CFG.supabaseUrl ? `<ol class="plain">
+        <li>In Excel: <strong>Data → Get Data → From Other Sources → Blank Query</strong>, then <strong>Advanced Editor</strong>.</li>
+        <li>Paste the code below and press <strong>Done</strong>. If Excel asks how to connect, choose <strong>Anonymous</strong>.</li>
+        <li><strong>Close &amp; Load</strong> to a new sheet named <em>App actuals</em>.</li>
+        <li>In <strong>Data → Queries &amp; Connections</strong>, right-click the query, <strong>Properties</strong>, and tick <strong>Refresh data when opening the file</strong> (and every 10 minutes, if you like).</li></ol>
+        <textarea class="mcode" readonly rows="11" aria-label="Excel query code">${esc(excelQuery("monthly"))}</textarea>
+        <div class="btn-row"><button class="btn ghost small-btn" data-act="copyQ" data-q="monthly">${ic("copy",18)} Copy monthly figures query</button><button class="btn ghost small-btn" data-act="copyQ" data-q="snapshot">${ic("copy",18)} Copy “today” snapshot query</button></div>
+        <p class="tiny muted" style="margin-top:8px">Last summary saved ${esc(S.ownerExport ? new Date(S.ownerExport.updated_at).toLocaleString("en-GB") : "not yet")}. The demo database can be read by anyone with the link, which is fine for sample data. Before real money, this needs a private, password-protected connection.</p>`
+      : `<p class="small muted">This works on your GitHub link once the shared database is connected (MACHO_CONFIG). Inside Claude there’s no database for Excel to read.</p>`}
+    </section>
     <section class="card" style="margin-top:20px"><h2>${ic("help",24)} What to track next</h2>
       <ul class="plain">
         <li><strong>Take rate:</strong> Macho’s income as a share of all money flowing through. Watch it stay between 1.5% and 3%.</li>
@@ -3340,6 +3391,7 @@ const actions = {
         payout:{ status:"processing", due:nextPayDay() }, history:[{ at:now(), by:REVIEWER, outcome:"approved", note:"" }], quality:{ photos:true, notes:true, time:true, checklist:true } };
       S.visits.push(v); }
     commit(`Added ${d.n} completed ${+d.n === 1 ? "visit" : "visits"}. Every dashboard has updated.`); },
+  copyQ(d){ const t = excelQuery(d.q); if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast("Query copied. Paste it into Excel’s Advanced Editor."), () => toast("Select the code in the box and copy it.")); else toast("Select the code in the box and copy it."); },
   obreak(d){ const prev = ui.modal && ui.modal.kind === "obreak" ? ui.modal.k : null; ui.modal = { kind:"obreak", k:d.k, back:prev && prev !== d.k ? prev : null }; renderModal(); },
   oPeriod(d){ ui.oPeriod = d.v; ui.oAll = false; render(); },
   oAll(){ ui.oAll = true; keepScroll(render); },
