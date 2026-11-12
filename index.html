@@ -1133,6 +1133,8 @@ function nextPayDay(){ const d = new Date(); const add = (5 - d.getDay() + 7) % 
 function payRef(id){ let h = 2166136261; for(const ch of id){ h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; } const a = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789"; let r = "S"; for(let i = 0; i < 9; i++){ h = (Math.imul(h, 1103515245) + 12345) >>> 0; r += a[(h >>> 8) % a.length]; } return r; }
 function ensureVisitRecord(v){
   if(v.status !== "approved") return v;
+  if(v.fee == null && VERIFIERS[v.verifierId]) v.fee = v.type === "onsite" ? VERIFIERS[v.verifierId].fee : VERIFIERS[v.verifierId].video;
+  if(v.proShare == null) v.proShare = PRO_SHARE;
   if(!v.history) v.history = [{ at:v.reviewedAt, by:v.reviewer || REVIEWER, outcome:"approved", note:v.reviewNote || "" }];
   if(!v.quality) v.quality = { photos:true, notes:true, time:true, checklist:true };
   if(!v.payout) v.payout = String(v.reviewedAt).startsWith("10 Nov 2026") ? { status:"processing", due:"Fri 13 Nov 2026" } : { status:"paid", on:addDays(v.reviewedAt, 3), ref:payRef(v.id), method:"M-Pesa" };
@@ -1163,7 +1165,7 @@ function seed(){
   return st;
 }
 const feeOf = v => v.fee || (v.type === "onsite" ? VERIFIERS[v.verifierId].fee : VERIFIERS[v.verifierId].video);
-const netOf = v => Math.round(feeOf(v) * PRO_SHARE);
+const netOf = v => Math.round(feeOf(v) * (v.proShare != null ? v.proShare : PRO_SHARE));
 const QUAL = [["photos","Clear photos"],["notes","Complete notes"],["time","On time"],["checklist","Followed the checklist"]];
 const qualScore = v => v.quality ? QUAL.filter(([k]) => v.quality[k]).length : null;
 
@@ -1773,6 +1775,9 @@ function viewPresenter(){
     : `<section class="card" style="margin-top:20px"><h2>${ic("plus",28)} Start a fresh demo</h2>
         <p>Inside Claude, a fresh demo means resetting the sample data on this device. To give each person their own link, use the version hosted on GitHub.</p>
         <div class="btn-row"><button class="btn sign" data-act="freshLocal">${ic("archive",20)} Reset to fresh sample data</button></div></section>`}
+    <section class="card" style="margin-top:16px"><h2>${ic("chart",28)} Add sample activity</h2>
+      <p class="small">Adds completed, approved video check-ins to the sample data, so you can watch every total move: the owner’s dashboard, the review desk, the professionals’ earnings and the client’s reports.</p>
+      <div class="btn-row"><button class="btn ghost small-btn" data-act="simVisits" data-n="1">${ic("plus",16)} 1 completed visit</button><button class="btn ghost small-btn" data-act="simVisits" data-n="5">${ic("plus",16)} 5 completed visits</button></div></section>
     <section class="card" style="margin-top:16px"><h2>${ic("clock",28)} Demo clock</h2>
       <p class="small">Move time forward to show reminders firing for everyone: professionals who haven’t answered, clients who haven’t decided, contractors with fixes due, and payments waiting at the bank.</p>
       <div class="btn-row">${[["2","+2 hours"],["12","+12 hours"],["24","+1 day"],["72","+3 days"]].map(([v, t]) => `<button class="btn ghost small-btn" data-act="clock" data-v="${v}">${ic("fastfwd",16)} ${t}</button>`).join("")}${S.clockShift ? `<button class="btn ghost small-btn" data-act="clock" data-v="0">Back to now</button>` : ""}</div>
@@ -1791,8 +1796,8 @@ function ledger(){
     Object.entries(mo.funded).forEach(([mid, f]) => push(f.on, "Client money into escrow", amt(p, mid), { p, m:mById(mid), ref:f.ref, bucket:"escrow-in" }));
     Object.entries(mo.releases).forEach(([mid, r]) => { if(r.status !== "paid") return; const a = amt(p, mid);
       push(r.paidAt, "Released to contractor or seller", a, { p, m:mById(mid), ref:r.bankRef, bucket:"escrow-out" });
-      push(r.paidAt, "Escrow fee earned", Math.round(a * ESCROW_FEE), { p, m:mById(mid), bucket:"rev-escrow" });
-      push(r.paidAt, "Bank escrow charge", Math.round(a * BANK_FEE), { p, m:mById(mid), bucket:"cost" }); }); });
+      push(r.paidAt, "Escrow fee earned", r.escrowFee != null ? r.escrowFee : Math.round(a * ESCROW_FEE), { p, m:mById(mid), bucket:"rev-escrow" });
+      push(r.paidAt, "Bank escrow charge", r.bankFee != null ? r.bankFee : Math.round(a * BANK_FEE), { p, m:mById(mid), bucket:"cost" }); }); });
   S.visits.forEach(v => { const p = pById(v.projectId), m = mById(v.milestoneId); if(!p || !m || v.status !== "approved") return; ensureVisitRecord(v);
     const fee = feeOf(v), net = netOf(v), d = String(v.reviewedAt).split(",")[0];
     push(d, "Visit fee paid by client", fee, { p, m, v, bucket:"fee-in" });
@@ -1814,11 +1819,12 @@ function ownerCalc(per){
   const hostMonths = per === "month" ? 1 : per === "year" ? nowD.getMonth() + 1 : monthsLive, hosting = OC().hostingKsh * hostMonths;
   const commission = sum("rev-commission"), escrowFees = sum("rev-escrow"), costs = sum("cost") + hosting, revenue = commission + escrowFees, net = revenue - costs;
   const held = S.projects.reduce((t, p) => t + moneySummary(p).held, 0), owed = all.filter(e => e.bucket === "owed").reduce((t, e) => t + e.amount, 0);
-  return { per, nowD, all, L, sum, commission, escrowFees, hosting, hostMonths, costs, revenue, net, held, owed };
+  const grossFees = sum("fee-in"), proShare = grossFees - commission, gross = grossFees + escrowFees;
+  return { per, nowD, all, L, sum, commission, escrowFees, hosting, hostMonths, costs, revenue, net, held, owed, grossFees, proShare, gross };
 }
 function viewOwner(){
   const per = ui.oPeriod || "all", C = ownerCalc(per);
-  const { nowD, all, L, commission, escrowFees, costs, net, held, owed } = C;
+  const { nowD, all, L, commission, escrowFees, costs, net, held, owed, gross, grossFees, proShare } = C;
   const usd = k => `$${Math.round(k / 130).toLocaleString("en-US")}`;
   const kpi = (v, t, sub, tone, key) => `<button class="sumcard drill ${tone || ""}" data-act="obreak" data-k="${key}" aria-label="${t}: ${money(v)}. Show the breakdown"><strong>${money(v)}</strong><span>${t}</span><span class="tiny muted">${sub || usd(v)}</span><span class="drillhint">${ic("list",14)} See breakdown</span></button>`;
   // checks that the numbers add up
@@ -1844,6 +1850,7 @@ function viewOwner(){
   return `<h1 class="hello">Owner’s dashboard</h1>
     <p class="hello-sub">Only you can see this. Money in, money out, what Macho earns, what it costs, and whether everything adds up.</p>
     <div class="chips pick" style="margin-top:14px">${tabs.map(([k, t]) => `<button data-act="oPeriod" data-v="${k}" aria-pressed="${per === k}">${t}</button>`).join("")}</div>
+    <div class="sumcards">${kpi(gross, "Total paid by clients to Macho", `Before paying professionals: ${usd(gross)}`, "", "gross")}${kpi(proShare, "Professionals’ 70% share", `Of ${money(grossFees)} in visit fees`, "", "proshare")}</div>
     <div class="sumcards">${kpi(net, "Macho net income", `${usd(net)} after estimated costs`, net >= 0 ? "" : "hot", "net")}${kpi(commission, "Commission on visit fees", `30% of each fee, ${usd(commission)}`, "", "comm")}${kpi(escrowFees, "Escrow handling fees", `${ESCROW_FEE * 100}% of money released, ${usd(escrowFees)}`, "", "escrow")}${kpi(costs, "Costs (estimated)", usd(costs), "", "costs")}</div>
     <div class="sumcards">${kpi(held, "Client money in escrow now", "Held by the partner bank, never Macho’s", "", "held")}${kpi(paidOut, "Paid to professionals (all time)", usd(paidOut), "", "paid")}${kpi(owed, "Owed to professionals", `Paid on ${nextPayDay()}`, "", "owed")}${kpi(out, "Released to contractors and sellers", usd(out), "", "released")}</div>
     <section class="card" style="margin-top:20px"><h2>${ic("shield",24)} Does everything add up?</h2>
@@ -2860,6 +2867,24 @@ function renderModal(){
     const costGroups = () => { const g = {}; C.L.filter(e => e.bucket === "cost").forEach(e => { const k = e.kind; g[k] = g[k] || { n:0, t:0, note:e.note }; g[k].n++; g[k].t += e.amount; if(e.note) g[k].note = e.note; });
       g["Hosting and tools"] = { n:C.hostMonths, t:C.hosting, note:`${C.hostMonths} ${C.hostMonths === 1 ? "month" : "months"} × ${money(OC().hostingKsh)}` }; return g; };
     const k = M.k;
+    if(k === "gross" || k === "proshare"){
+      const es = C.L.filter(e => e.bucket === "fee-in");
+      title = k === "gross" ? `Total paid by clients to Macho, ${pn}: ${money(C.gross)}` : `Professionals’ share, ${pn}: ${money(C.proShare)}`;
+      intro = k === "gross" ? "Everything clients paid Macho, before anything went to professionals, and where it went." : `${Math.round(PRO_SHARE * 100)}% of every visit fee goes to the professional who did the check.`;
+      body = (k === "gross" ? `<ul class="rows calc">
+          ${line("Visit fees paid by clients", C.grossFees, "+")}
+          ${line(`Passed on to professionals (${Math.round(PRO_SHARE * 100)}%)`, C.proShare, "−", "proshare")}
+          <li class="sub"><span><strong>Macho’s commission (${100 - Math.round(PRO_SHARE * 100)}%)</strong></span><strong>${money(C.commission)}</strong></li>
+          ${line(`Escrow handling fees (${ESCROW_FEE * 100}% of money released)`, C.escrowFees, "+", "escrow")}
+          <li class="sub"><span><strong>Macho’s income</strong></span><strong>${money(C.revenue)}</strong></li>
+          ${line("Running costs", C.costs, "−", "costs")}
+          <li class="tot"><span><strong>Net income</strong></span><strong>${money(C.net)}</strong></li></ul>
+          <p class="small muted" style="margin-top:8px">Total paid by clients = ${money(C.grossFees)} visit fees + ${money(C.escrowFees)} escrow fees = ${money(C.gross)}. Client stage payments held in escrow aren’t included: that money belongs to the clients until it’s released to their contractor or seller.</p>
+          <h3 class="modal-sub" style="font-size:1.1rem">Each visit fee and how it was split</h3>` : "") +
+        tbl(es.map(e => `<tr><td class="small">${esc(e.date)}</td><td class="small">${where(e)}</td><td class="small">${VERIFIERS[e.v.verifierId].name}</td><td>${money(e.amount)}</td><td>${money(netOf(e.v))}</td><td><strong>${money(e.amount - netOf(e.v))}</strong></td></tr>`),
+          ["Date","Project","Professional","Client paid","To professional","To Macho"], null) +
+        `<p class="small" style="margin-top:8px"><strong>Totals:</strong> clients paid ${money(C.grossFees)}, professionals get ${money(C.proShare)}, Macho keeps ${money(C.commission)}.</p>`;
+    }
     if(k === "net"){
       const g = costGroups();
       title = `Macho net income, ${pn}: ${money(C.net)}`;
@@ -3251,6 +3276,7 @@ const actions = {
     commit(r.status === "sent" ? "Second check done. Sent to the bank." : `Checked by ${who}. A second person must check it too.`); },
   relPaid(d){ const p = pById(d.pid), m = mById(d.mid), r = relOf(p, m.id), a = amt(p, m.id);
     r.status = "paid"; r.paidAt = today(); r.bankRef = "FT" + payRef(p.id + m.id).slice(1, 10); p.paid[m.id] = r.paidAt; ui.shot[p.id] = null;
+    r.escrowFee = Math.round(a * ESCROW_FEE); r.bankFee = Math.round(a * BANK_FEE);
     post("updates", "macho", `Paid: ${money(a)} to ${p.contractor} for ${m.name.toLowerCase()} at ${p.town}. Bank reference ${r.bankRef}.`, { pid:p.id, read:false });
     commit("The bank confirmed the payment."); },
   clock(d){ S.clockShift = d.v === "0" ? 0 : (S.clockShift || 0) + (+d.v); commit(S.clockShift ? `Demo clock moved forward. Now ${ago(Date.now())} ahead.` : "Demo clock back to now."); },
@@ -3304,6 +3330,16 @@ const actions = {
   freshLocal(){ S = seed(); save(); ui.page = "home"; toast("Fresh sample data loaded on this device."); render(); },
   newProject(d){ ui.modal = {kind:"newProject", type:(d && d.type) || "build"}; renderModal(); },
   hf(d){ ui.hf = d.v; render(); },
+  simVisits(d){
+    const open = S.projects.filter(p => !p.closed && currentMilestone(p)); if(!open.length){ toast("No open projects to add visits to."); return; }
+    for(let i = 0; i < +d.n; i++){
+      const p = open[(S.nextId + i) % open.length], m = currentMilestone(p), sid = assignVerifier(p, m.id) || Object.keys(VERIFIERS)[0], x = VERIFIERS[sid];
+      const v = { id:"visit-" + (S.nextId++), projectId:p.id, milestoneId:m.id, type:"video", verifierId:sid, scheduled:now(), status:"approved", checkedInAt:now(),
+        checklist:Object.fromEntries(m.items.map(it => [it.id, "pass"])), reasons:{}, other:{}, photos:Object.fromEntries(m.shots.map(sh => [sh.id, { kind:"demo", art:sh.art, stage:mIdx(m.id), stamp:now() }])), issuePhotos:{},
+        progress:50, summary:"Sample video check-in added from Demo controls.", reviewer:REVIEWER, reviewedAt:now(), reviewedTs:NOWMS(), submittedAt:now(), fee:x.video, proShare:PRO_SHARE,
+        payout:{ status:"processing", due:nextPayDay() }, history:[{ at:now(), by:REVIEWER, outcome:"approved", note:"" }], quality:{ photos:true, notes:true, time:true, checklist:true } };
+      S.visits.push(v); }
+    commit(`Added ${d.n} completed ${+d.n === 1 ? "visit" : "visits"}. Every dashboard has updated.`); },
   obreak(d){ const prev = ui.modal && ui.modal.kind === "obreak" ? ui.modal.k : null; ui.modal = { kind:"obreak", k:d.k, back:prev && prev !== d.k ? prev : null }; renderModal(); },
   oPeriod(d){ ui.oPeriod = d.v; ui.oAll = false; render(); },
   oAll(){ ui.oAll = true; keepScroll(render); },
@@ -3491,7 +3527,7 @@ const actions = {
   approve(d){ const v = vById(d.vid); v.status = "approved"; v.reviewNote = (v.reviewNoteDraft || "").trim(); v.reviewNoteDraft = ""; v.reviewedAt = now(); v.reviewedTs = NOWMS(); v.reviewer = REVIEWER; ui.rVisit = null;
     v.history = (v.history || []).concat([{ at:now(), by:REVIEWER, outcome:"approved", note:v.reviewNote }]);
     v.quality = Object.fromEntries(QUAL.map(([k]) => [k, !(ui.rq && ui.rq[k] === false)])); ui.rq = null;
-    v.payout = { status:"processing", due:nextPayDay() };
+    v.payout = { status:"processing", due:nextPayDay() }; v.fee = feeOf(v); v.proShare = PRO_SHARE;
     if(v.type === "onsite") ui.shot[v.projectId] = null;
     if(v.recheck){ const p = pById(v.projectId), f = fx(p).find(x => x.id === v.fixOf), old = f && vById(f.vid);
       if(f){ f.status = "done"; } if(old && band(v).k === "good") old.resolved = `Fixed by the contractor and re-checked by ${VERIFIERS[v.verifierId].name} on ${today()}.`; }
