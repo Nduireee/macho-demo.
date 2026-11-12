@@ -505,6 +505,51 @@ body.no-bar .foot{display:none}
 .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;overflow:visible}
 .tabs button{white-space:normal;padding:10px 4px;font-size:1rem;justify-content:center;text-align:center;min-height:56px;flex-wrap:wrap;gap:4px}
 @media (max-width:360px){.tabs{grid-template-columns:repeat(2,1fr)}}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:20px}
+.kpi{font:inherit;color:var(--ink);text-align:left;background:var(--surface);border:2px solid var(--line-soft);border-radius:8px;padding:14px 16px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.kpi strong{font-family:var(--head);font-size:2.2rem;line-height:1}
+.kpi span{font-size:.88rem;color:var(--muted)}
+.kpi.hot{border-color:var(--sign);border-width:3px}
+.kpi.on{background:var(--bg);border-color:var(--ink)}
+.review-detail{max-width:900px}
+.tablewrap{overflow-x:auto}
+.ptable{width:100%;border-collapse:collapse;font-size:.95rem}
+.ptable th{text-align:left;font-size:.82rem;color:var(--muted);font-weight:700;padding:8px 10px;border-bottom:2px solid var(--line-soft);white-space:nowrap}
+.ptable td{padding:10px;border-bottom:1.5px solid var(--line-soft);vertical-align:middle;font-variant-numeric:tabular-nums}
+.ptable td.warn{color:var(--bad);font-weight:700}
+
+.ccwrap{display:flex;align-items:stretch;border:2px solid var(--line);border-radius:6px;background:var(--surface);overflow:hidden}
+.ccwrap:focus-within{outline:3px solid var(--focus);outline-offset:2px}
+.ccpre{display:grid;place-items:center;padding:0 12px;background:var(--bg);font-weight:700;border-right:2px solid var(--line);font-variant-numeric:tabular-nums}
+.ccwrap input{border:0 !important;border-radius:0 !important;flex:1;min-width:0;outline:none}
+.pro-tabs{grid-template-columns:repeat(5,1fr) !important;gap:2px}
+.pro-tabs button{flex-direction:column;gap:2px;font-size:.82rem;padding:8px 2px;min-height:64px;position:relative}
+.pro-tabs .count{position:absolute;top:4px;right:calc(50% - 26px);min-width:20px;height:20px;font-size:.72rem;padding:0 5px}
+@media (max-width:360px){.pro-tabs{grid-template-columns:repeat(5,1fr) !important}.pro-tabs button span:not(.count){font-size:.72rem}}
+.favbtn{flex:none;display:inline-flex;align-items:center;gap:6px;font:inherit;font-weight:700;background:var(--surface);color:var(--muted);border:2px solid var(--line-soft);border-radius:22px;min-width:44px;height:44px;justify-content:center;cursor:pointer;padding:0 10px}
+.favbtn.on{color:#C2185B;border-color:#C2185B;background:#FCE4EC}
+.favbtn.on svg path{fill:#C2185B}
+.favbtn.big{height:52px;padding:0 16px}
+.favoffer{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:14px 0 4px;padding:12px;border-radius:8px;background:#FCE4EC;color:#16212B}
+.favoffer .small{color:#3a3a3a}
+.favnote{color:#C2185B;font-weight:700}
+.quick{display:flex;gap:8px;overflow-x:auto;padding:10px 0 4px;scrollbar-width:thin}
+.quick button{flex:none;font:inherit;font-size:.9rem;font-weight:700;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:20px;padding:8px 12px;cursor:pointer;min-height:42px}
+.viewswitch{display:inline-flex;gap:0;margin-top:14px;border:2px solid var(--line);border-radius:8px;overflow:hidden}
+.viewswitch button{font:inherit;font-weight:700;border:0;background:var(--surface);color:var(--ink);padding:9px 16px;display:inline-flex;gap:6px;align-items:center;cursor:pointer;min-height:44px}
+.viewswitch button[aria-pressed="true"]{background:var(--navy);color:#fff}
+.cal{list-style:none;margin:10px 0 0;padding:0;background:var(--surface);border:2px solid var(--line-soft);border-radius:8px}
+.cal li{display:flex;gap:12px;padding:10px 12px;border-top:1.5px solid var(--line-soft);align-items:flex-start}
+.cal li:first-child{border-top:0}
+.cal li.sun{background:var(--bg)}
+.caldate{flex:none;width:46px;text-align:center;display:flex;flex-direction:column;line-height:1.1}
+.caldate strong{font-family:var(--head);font-size:1.6rem}
+.caldate span{font-size:.78rem;color:var(--muted)}
+.cal li.busy .caldate strong{color:var(--navy)}
+.calday{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+.calitem{display:flex;gap:10px;align-items:flex-start;text-align:left;font:inherit;color:var(--ink);background:var(--soft);border:0;border-left:5px solid var(--navy);border-radius:4px;padding:8px 10px;cursor:pointer;width:100%}
+.calitem.request{background:#FFF4CC;border-left-color:var(--sign)}
+.caltime{flex:none;font-weight:800;font-variant-numeric:tabular-nums;min-width:44px}
 
 .linkbox{min-width:min(520px,62vw)}
 .sync{font-weight:700;padding:2px 10px;border-radius:12px;background:rgba(255,255,255,.12)}
@@ -535,14 +580,16 @@ body.no-bar .foot{display:none}
      their own side. Demo links (with ?demo=1 or ?room=...) always show the bar.
    realSignIn: true sends real SMS codes through Supabase. Only turn this on
      after setting up Phone sign-in and an SMS provider in Supabase.
-   staffPhones: numbers allowed into the review desk, with country code.
+   ownerPhones: the owner’s numbers. Only these can sign in as client, professional and review desk.
+   staffPhones: other numbers allowed into the review desk, with country code.
    ====================================================================== */
 window.MACHO_CONFIG = {
-  supabaseUrl: "",
-  supabaseKey: "",
+  supabaseUrl: "https://raooitwtvgpdvqdmzpiv.supabase.co",
+  supabaseKey: "sb_publishable_f6Jr1TeuON2jykULcY357Q_8f4tB90Z",
   room: "demo",
   demoMode: false,
   realSignIn: false,
+  ownerPhones: ["+254702384722"],
   staffPhones: ["+254700000123"]
 };
 </script>
@@ -573,6 +620,10 @@ const ICONS = {
   chat:'<path d="M4 4h16v12H8l-4 4z"/>',
   mail:'<rect x="3" y="5" width="18" height="14" rx="1"/><path d="m3 7 9 6 9-6"/>',
   star:'<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/>',
+  heart:'<path d="M12 20s-7-4.5-9-9a4.5 4.5 0 0 1 9-3 4.5 4.5 0 0 1 9 3c-2 4.5-9 9-9 9z"/>',
+  list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  briefcase:'<rect x="3" y="7" width="18" height="13" rx="1"/><path d="M8 7V4h8v3M3 12h18"/>',
+  pencil:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13 7 4 4"/>',
   wallet:'<rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20M16 15h2"/><path d="M5 6V4h12v2"/>',
   folder:'<path d="M3 6h6l2 2h10v11H3z"/>',
   star:'<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/>',
@@ -932,6 +983,13 @@ function seed(){
   if(v3){ v3.history = [{ at:"14 Oct 2026, 15:10", by:REVIEWER, outcome:"returned", note:"Photo 2 is blurred and the mesh height above the membrane isn’t visible. Please add a close-up with a tape measure." },
                         { at:"14 Oct 2026, 17:40", by:REVIEWER, outcome:"approved", note:"Good catch on the beam steel. Clear photos now." }];
     v3.quality = { photos:false, notes:true, time:true, checklist:true }; }
+  st.needsFeed = true;
+  /* Something on the review desk from the start: one report waiting, one sent back */
+  st.visits.push(pastVisit("p1","visit-60",3,"v7","11 Nov 2026",{d6:{na:true},d7:{na:true}},"Walls about chest height on three sides. The back wall is lower because the stone delivery was late.","",
+    {type:"video", progress:60, status:"submitted", reviewedAt:null, reviewer:null, submittedAt:"11 Nov 2026, 17:20", checkedInAt:"11 Nov 2026, 16:40"}));
+  st.visits.push(pastVisit("p6","visit-61","h1","v10","11 Nov 2026",{ha5:{r:["No completion date"], o:"The draft agreement has no completion date or penalty for delay."}},"Title and approvals are in order. The sale agreement needs a completion date before you sign.","",
+    {status:"returned", reviewedAt:"11 Nov 2026, 12:05", reviewer:REVIEWER, submittedAt:"11 Nov 2026, 10:30", reviewNote:"Photo 4 (the draft agreement) is too dark to read. Please retake it in daylight and add the page with the payment terms.",
+     history:[{ at:"11 Nov 2026, 12:05", by:REVIEWER, outcome:"returned", note:"Photo 4 (the draft agreement) is too dark to read. Please retake it in daylight and add the page with the payment terms." }]}));
   return st;
 }
 const feeOf = v => v.fee || (v.type === "onsite" ? VERIFIERS[v.verifierId].fee : VERIFIERS[v.verifierId].video);
@@ -945,7 +1003,7 @@ const ROOM0 = QS.get("room") || ((typeof window !== "undefined" && window.MACHO_
 /* Demo mode shows the blue prototype bar and lets you switch sides freely.
    On: inside Claude, with ?demo=1 in the link, or demoMode:true in MACHO_CONFIG. Off: people must sign in, and see only their own side. */
 const DEMO = !!((typeof window !== "undefined" && window.claude) || QS.get("demo") === "1" || QS.get("room") || (window.MACHO_CONFIG && window.MACHO_CONFIG.demoMode));
-const KEY = "macho-demo-v10" + (ROOM0 === "demo" ? "" : ":" + ROOM0);
+const KEY = "macho-demo-v12" + (ROOM0 === "demo" ? "" : ":" + ROOM0);
 const SESSKEY = "macho-session" + (ROOM0 === "demo" ? "" : ":" + ROOM0);
 let SESSION = (() => { try{ return JSON.parse(localStorage.getItem(SESSKEY)) || null; }catch(e){ return null; } })();
 function saveSession(){ try{ if(SESSION) localStorage.setItem(SESSKEY, JSON.stringify(SESSION)); else localStorage.removeItem(SESSKEY); }catch(e){} }
@@ -1140,7 +1198,15 @@ function wireCaps(){
   }).catch(() => {}));
 }
 function post(thread, from, text, extra){ msgs().push(Object.assign({ thread, from, text, at:now(), read:from === "client" }, extra || {})); }
-const unread = t => msgs().filter(m => (t ? m.thread === t : m.thread !== "help") && !m.read && m.from !== "client").length;
+const unread = t => msgs().filter(m => (t ? m.thread === t : m.thread !== "help" && !String(m.thread).startsWith("pro-")) && !m.read && m.from !== "client").length;
+/* Each professional has their own feed of notices from Macho: requests, review decisions, payments, disputes */
+const proThread = sid => "pro-" + sid;
+function proPost(sid, text, extra){ if(sid) msgs().push(Object.assign({ thread:proThread(sid), from:"macho", text, at:now(), read:false }, extra || {})); }
+function proUnread(sid){
+  const feed = msgs().filter(m => m.thread === proThread(sid) && !m.read).length;
+  const mine = reqs().filter(r => r.sid === sid).map(reqThread);
+  return feed + msgs().filter(m => mine.includes(m.thread) && m.from === "client" && !m.seenAt).length;
+}
 const reqThread = r => "req-" + r.id.replace(/^req-/, "");
 const pendingReq = (p, mid) => reqs().filter(r => r.pid === p.id && r.mid === mid && r.type === "onsite" && r.status === "pending").slice(-1)[0];
 const lastDeclined = (p, mid) => { const l = reqs().filter(r => r.pid === p.id && r.mid === mid && r.type === "onsite").slice(-1)[0]; return l && l.status === "declined" && !l.seen ? l : null; };
@@ -1166,7 +1232,7 @@ const released = p => MS(p).filter(m => p.paid[m.id]).reduce((a, m) => a + amt(p
 function prevVerifier(v){ const list = S.visits.filter(x => x.projectId === v.projectId); const i = list.indexOf(v); return i > 0 ? list[i-1].verifierId : null; }
 function assignVerifier(p, mid){
   const last = lastSurveyor(p), c = p.county.replace(" County", ""), st = mById(mid || (currentMilestone(p) || {}).id) || MILESTONES[0];
-  const fit = Object.keys(VERIFIERS).filter(id => st.roles.includes(VERIFIERS[id].role));
+  const fit = Object.keys(VERIFIERS).filter(id => st.roles.includes(VERIFIERS[id].role) && !isAway(id));
   const local = fit.filter(id => id !== last && VERIFIERS[id].counties.includes(c));
   const pool = local.length ? local : fit.filter(id => id !== last).length ? fit.filter(id => id !== last) : fit;
   return pool[(pVisits(p).length) % pool.length]; }
@@ -1367,7 +1433,7 @@ const latestShot = p => { let k = 0; shots(p).forEach((s, i) => { if(s.state !==
 
 /* ---------- Header ---------- */
 function renderChrome(){
-  const signOutBtn = SESSION ? `<button class="btn ghost small-btn" data-act="signOut">Sign out</button>` : "";
+  const signOutBtn = SESSION ? `${SESSION.owner ? `<button class="btn ghost small-btn" data-act="toSignIn">Switch account</button>` : ""}<button class="btn ghost small-btn" data-act="signOut">Sign out</button>` : "";
   const label = needSignIn() ? (DEMO ? `<button class="btn ghost small-btn" data-act="cancelSignIn">Skip sign-in</button>` : "")
     : ui.role === "presenter" ? `<span class="who-chip"><span class="avatar">${ic("stages",20)}</span><span class="who-name">Demo controls</span></span>`
     : ui.role === "client" ? `<nav class="client-nav" aria-label="Main"><button class="btn ${["home","project"].includes(ui.page) ? "" : "ghost"} small-btn" data-act="home" aria-label="My projects">${ic("home",20)} <span class="tr-label">${L("My projects")}</span></button>
@@ -1392,6 +1458,44 @@ const ROLE_PICK = { client:{ t:"I’m building or buying from abroad", d:"See yo
   verifier:{ t:"I’m a professional", d:"Surveyors, engineers, advocates, valuers and buyer’s agents", icon:"hardhat" },
   review:{ t:"I work on the Macho review desk", d:"Staff only", icon:"shield" } };
 const REAL_AUTH = () => !!(CFG.realSignIn && SYNC.db);
+/* Accepts 0702 384 722, 702384722, 254702384722 or +254 702 384 722: all become +254702384722 */
+function fullPhone(cc, typed){
+  const raw = String(typed || "").trim(), d = raw.replace(/\D/g, ""), c = cc.replace(/\D/g, "");
+  if(raw.startsWith("+") || raw.startsWith("00")) return "+" + d.replace(/^00/, "");
+  if(d.startsWith(c) && d.length - c.length >= 7) return "+" + d;
+  return "+" + c + d.replace(/^0+/, "");
+}
+const samePhone = (a, b) => String(a).replace(/\D/g, "") === String(b).replace(/\D/g, "");
+/* One number, one kind of account. Only the owner’s numbers may use all three.
+   Professionals only after the review desk has checked their registration; the review desk only for staff numbers. */
+const OWNERS = () => CFG.ownerPhones || [];
+const isOwner = ph => OWNERS().some(x => samePhone(x, ph));
+const accounts = () => S.accounts || (S.accounts = {});
+const apps = () => S.applications || (S.applications = []);
+const ROLE_NAME = { client:"a client", verifier:"a professional", review:"review desk staff" };
+function roleOfPhone(ph){
+  const k = String(ph).replace(/\D/g, "");
+  if(accounts()[k]) return accounts()[k].role;
+  if((CFG.staffPhones || []).some(x => samePhone(x, ph))) return "review";
+  if(Object.values(VERIFIERS).some(x => samePhone(x.phone, ph))) return "verifier";
+  if(samePhone(DEMO_PHONES.client, ph)) return "client";
+  return null;
+}
+let VBASE = null;
+function mergePros(){
+  if(!VBASE) VBASE = JSON.parse(JSON.stringify(VERIFIERS));
+  Object.keys(VBASE).forEach(id => { VERIFIERS[id] = Object.assign(JSON.parse(JSON.stringify(VBASE[id])), (S.proEdits || {})[id] || {}); });
+  Object.entries(S.extraPros || {}).forEach(([id, x]) => { VERIFIERS[id] = Object.assign({}, x, (S.proEdits || {})[id] || {}); VERIFIERS[id].services = ROLE_INFO[x.role].for.split(","); });
+}
+const isAway = id => VERIFIERS[id] && VERIFIERS[id].away;
+const proAlert = (sid, k) => { const n = ((S.proEdits || {})[sid] || {}).notify; return n ? !!n[k] : k === "wa"; };
+const favs = () => S.favs || (S.favs = ["v3"]);
+const isFav = id => favs().includes(id);
+const favBtn = (id, big) => `<button class="favbtn ${isFav(id) ? "on" : ""} ${big ? "big" : ""}" data-act="toggleFav" data-sid="${id}" aria-pressed="${isFav(id)}" aria-label="${isFav(id) ? "Remove from" : "Add to"} favourites">${ic("heart", big ? 22 : 20)}${big ? `<span>${isFav(id) ? "Favourite" : "Add to favourites"}</span>` : ""}</button>`;
+/* A favourite who can do the next step: right role, not the last person on this project, not away */
+const isClientFav = id => favs().includes(id);
+function favFor(p, m){ return favs().find(id => VERIFIERS[id] && m.roles.includes(VERIFIERS[id].role) && !isAway(id) && lastSurveyor(p) !== id); }
+const rt = x => x.reviews ? x.rating.toFixed(1) : "New";
 function needSignIn(){ return ui.forceSignIn || (!DEMO && !SESSION); }
 function viewSignIn(){
   const si = ui.si || (ui.si = ui.siWanted ? { step:2, role:ui.siWanted, cc:ui.siWanted === "client" ? "+1" : "+254", phone:"" } : { step:1, role:null, cc:"+1", phone:"" });
@@ -1404,27 +1508,45 @@ function viewSignIn(){
     const r = ROLE_PICK[si.role];
     body = `${back}<h1 class="hello" style="font-size:2.2rem">Your phone number</h1><p class="hello-sub">${r.t}. We’ll send a 6-digit code by text message.</p>
       <div class="phone-row"><label class="field" style="flex:0 0 200px">Country<select data-field="siCc">${CODES.map(([c, n]) => `<option value="${c}" ${si.cc === c ? "selected" : ""}>${n} (${c})</option>`).join("")}</select></label>
-        <label class="field" style="flex:1">Phone number<input type="tel" inputmode="tel" id="si-phone" value="${esc(si.phone)}" placeholder="Your number without the first 0" autocomplete="tel"></label></div>
+        <label class="field" style="flex:1">Phone number<span class="ccwrap"><span class="ccpre" aria-hidden="true">${si.cc}</span><input type="tel" inputmode="numeric" id="si-phone" data-field="siPhone" value="${esc(si.phone)}" placeholder="${si.cc === "+254" ? "702 384 722" : "Rest of your number"}" autocomplete="tel-national" aria-label="Phone number after ${si.cc}"></span></label></div>
+      <p class="tiny muted">Type the number after ${si.cc}, without the first 0.</p>
       ${DEMO ? `<p class="small muted">Demo: <button class="linkish" data-act="siSample">use the sample number</button>.</p>` : ""}
       <p id="si-err" class="note" role="alert"></p>
       <div class="btn-row"><button class="btn sign wide" data-act="siSend">${ic("send",20)} Send me a code</button></div>`;
   } else if(si.step === 3){
-    body = `${back}<h1 class="hello" style="font-size:2.2rem">Enter the code</h1><p class="hello-sub">We sent a 6-digit code to ${esc(si.cc + " " + si.phone)}.</p>
+    body = `${back}<h1 class="hello" style="font-size:2.2rem">Enter the code</h1><p class="hello-sub">We sent a 6-digit code to ${esc(fullPhone(si.cc, si.phone))}.</p>
       ${si.demoCode ? `<div class="callout">${ic("chat",22)}<p><strong>Demo text message:</strong> Your Macho code is <strong class="code">${si.demoCode}</strong>. In the live app this arrives by SMS.</p></div>` : ""}
       <label class="field">6-digit code<input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" id="si-code" class="codein" placeholder="••••••"></label>
       <p id="si-err" class="note" role="alert"></p>
       <div class="btn-row"><button class="btn sign wide" data-act="siVerify">${ic("check",20)} Sign in</button></div>
       <p class="small" style="margin-top:12px">No code? <button class="linkish" data-act="siSend">Send it again</button></p>`;
+  } else if(si.step === 5){
+    body = `${back}<h1 class="hello" style="font-size:2.2rem">Apply to join as a professional</h1>
+      <p class="hello-sub">${esc(fullPhone(si.cc, si.phone))} isn’t on our list of checked professionals yet. Tell us who you are. Our review desk checks your registration with your professional board and your ID before you can take any job.</p>
+      <div class="fields" style="grid-template-columns:1fr">
+        <label class="field">Full name, as on your ID<input type="text" id="ap-name"></label>
+        <label class="field">Your profession<select id="ap-role">${ROLES.map(r => `<option>${r}</option>`).join("")}</select></label>
+        <label class="field">Registration or licence number<input type="text" id="ap-reg" placeholder="For example, BORAQS QS 1234"></label>
+        <label class="field">National ID number<input type="text" id="ap-id" inputmode="numeric"></label>
+        <label class="field">Counties you work in<input type="text" id="ap-counties" placeholder="For example, Nairobi, Kiambu"></label></div>
+      <label class="opt" style="margin-top:12px"><input type="checkbox" id="ap-coi"><span>I am not a contractor, developer or seller, and I will declare any link to a party in a job before accepting it.</span></label>
+      <p id="si-err" class="note" role="alert"></p>
+      <div class="btn-row"><button class="btn sign wide" data-act="apSend">Send my application</button></div>`;
+  } else if(si.step === 6){
+    const a = apps().filter(x => samePhone(x.phone, fullPhone(si.cc, si.phone))).slice(-1)[0];
+    body = `<h1 class="hello" style="font-size:2.2rem">${a && a.status === "rejected" ? "Application not approved" : "Application received"}</h1>
+      <p class="hello-sub">${a && a.status === "rejected" ? `Reason: ${esc(a.note || "not given")}. You can contact the help desk to ask about it.` : "We’re checking your registration with your board and your ID. This usually takes 1 to 2 working days. We’ll send you a text message when you can sign in."}</p>
+      <div class="btn-row"><button class="btn ghost" data-act="siRestart">Back to sign-in</button></div>`;
   } else if(si.step === 4){
     body = `${back}<h1 class="hello" style="font-size:2.2rem">Which professional are you?</h1>
-      <p class="hello-sub">${DEMO ? "Demo: pick a sample profile to sign in as." : "Your number isn’t linked to a profile yet. In the live app, the review desk checks your registration with your board before you can take jobs."}</p>
+      <p class="hello-sub">Owner access: pick which professional to sign in as.</p>
       <div class="sipick">${Object.entries(VERIFIERS).map(([id, x]) => `<button class="whatbtn" data-act="siPro" data-v="${id}">${avatar(id, 48)}<span><strong style="font-size:1.2rem">${x.name}</strong><span class="small muted">${x.role}</span></span></button>`).join("")}</div>`;
   }
   return `<div class="signin">${body}
     <p class="tiny muted" style="margin-top:20px">${ic("lock",14)} We never ask for a password, and never ask you to share this code with anyone, including Macho staff.</p></div>`;
 }
 function signInAs(role, extra){
-  SESSION = Object.assign({ role, phone:(ui.si ? ui.si.cc + " " + ui.si.phone : ""), at:now() }, extra || {}); saveSession();
+  SESSION = Object.assign({ role, phone:(ui.si ? fullPhone(ui.si.cc, ui.si.phone) : ""), at:now() }, extra || {}); saveSession();
   ui.forceSignIn = false; ui.si = null; ui.modal = null;
   ui.role = role; if(role === "verifier"){ ui.signedIn = SESSION.sid; ui.vTab = null; ui.vVisit = null; }
   if(role === "client"){ ui.page = "home"; }
@@ -1505,9 +1627,9 @@ function viewHome(){
 /* ---------- Client: find a surveyor ---------- */
 function peopleList(){
   const F = ui.f;
-  let list = Object.entries(VERIFIERS).filter(([id, x]) => (!F.svc || F.svc === "all" || x.services.includes(F.svc)) && (F.role === "all" || x.role === F.role) && x.years >= F.exp && (F.county === "any" || x.counties.includes(F.county)));
+  let list = Object.entries(VERIFIERS).filter(([id, x]) => (!F.favs || isFav(id)) && (!F.svc || F.svc === "all" || x.services.includes(F.svc)) && (F.role === "all" || x.role === F.role) && x.years >= F.exp && (F.county === "any" || x.counties.includes(F.county)));
   const by = { exp:(a, b) => b[1].years - a[1].years, rating:(a, b) => b[1].rating - a[1].rating || b[1].reviews - a[1].reviews, visits:(a, b) => b[1].visits - a[1].visits, fee:(a, b) => a[1].fee - b[1].fee }[F.sort];
-  return list.sort(by);
+  return list.sort((a, b) => (isFav(b[0]) - isFav(a[0])) || by(a, b));
 }
 function reqRow(r){
   const x = VERIFIERS[r.sid], p = pById(r.pid), m = mById(r.mid);
@@ -1529,6 +1651,7 @@ function viewPeople(){
     <p class="hello-sub">Surveyors, engineers, advocates, valuers and buyer’s agents. Every person here is registered with their professional body and background-checked by Macho. Pick someone yourself, or let us assign the next available.</p>
     ${mine.length ? `<section class="card" style="margin-top:22px"><h2>${ic("users",28)} Your requests</h2><ul class="rows">${mine.map(reqRow).join("")}</ul></section>` : ""}
     <div class="filters card" style="margin-top:22px">
+      <label class="field">Show<select data-field="fFavs"><option value="0" ${F.favs ? "" : "selected"}>Everyone</option><option value="1" ${F.favs ? "selected" : ""}>My favourites (${favs().length})</option></select></label>
       ${sel("fSvc", [["all","Everything"],["build","Building checks"],["land","Land checks"],["home","House and flat checks"]], F.svc || "all", "I need help with")}
       ${sel("fRole", [["all","All roles"]].concat(ROLES.filter(r => !F.svc || F.svc === "all" || ROLE_INFO[r].for.includes(F.svc)).map(r => [r, r])), F.role, "Role")}
       ${sel("fExp", [[0,"Any experience"],[5,"5 years or more"],[10,"10 years or more"],[15,"15 years or more"]], F.exp, "Experience")}
@@ -1537,15 +1660,16 @@ function viewPeople(){
     </div>
     <p class="small muted" style="margin:14px 2px 0">${list.length} ${list.length === 1 ? "person matches" : "people match"}.</p>
     <div class="people">${list.length ? list.map(([id, x]) => `<article class="card person">
-      <div class="person-top">${avatar(id, 56)}<div><h2>${x.name}</h2><p class="muted">${x.role}</p></div></div>
+      <div class="person-top">${avatar(id, 56)}<div style="flex:1"><h2>${x.name}</h2><p class="muted">${x.role}</p></div>${favBtn(id)}</div>
       <p class="small svc">${x.services.map(k => `<span class="tagsvc">${{build:"Building",land:"Land",home:"Houses and flats"}[k]}</span>`).join("")}</p>
       <p class="small regline">${ic("shield",18)} ${x.reg} <span class="pill pass">Checked</span></p>
-      <div class="pstats"><div><strong>${x.years}</strong><span>years’ experience</span></div><div><strong>${x.visits}</strong><span>Macho visits</span></div><div><strong>${x.rating.toFixed(1)}</strong><span>rating, ${x.reviews} reviews</span></div></div>
+      <div class="pstats"><div><strong>${x.years}</strong><span>years’ experience</span></div><div><strong>${x.visits}</strong><span>Macho visits</span></div><div><strong>${rt(x)}</strong><span>rating, ${x.reviews} reviews</span></div></div>
       <p class="small">${ic("pin",18)} ${x.counties.join(", ")}</p>
       <p class="small">${ic("calendar",18)} Next free ${x.next}. ${x.turnaround}.</p>
       <p class="small"><strong>${money(x.fee)}</strong> per site visit, ${money(x.video)} per video check-in</p>
+      ${x.away ? `<p class="small"><span class="pill issue">Not taking new jobs right now</span></p>` : ""}
       <span class="spacer"></span>
-      <div class="btn-row"><button class="btn ghost" data-act="viewPerson" data-sid="${id}">View profile</button><button class="btn sign" data-act="requestPerson" data-sid="${id}">${ic("calendar",20)} Request</button></div>
+      <div class="btn-row"><button class="btn ghost" data-act="viewPerson" data-sid="${id}">View profile</button><button class="btn sign" data-act="requestPerson" data-sid="${id}" ${x.away ? "disabled" : ""}>${ic("calendar",20)} Request</button></div>
     </article>`).join("") : `<div class="card"><p class="empty-msg">Nobody matches all of these filters. Try a lower experience level or any county.</p></div>`}</div>`;
 }
 
@@ -1785,6 +1909,8 @@ function nextHTML(p){
   else if(st === "upcoming") h = `<h2>${ic("calendar",30)} Next: ${cur.name}</h2>
       ${dec ? `<div class="callout bad">${ic("alert",22)}<p>${VERIFIERS[dec.sid].name} can’t take this visit${dec.why ? ` (${esc(dec.why.toLowerCase())})` : ""}. Choose someone else, or let Macho assign the next available surveyor.</p></div>` : ""}
       <p>Get this stage checked before you release ${a ? money(a) : "anything"}. Let Macho assign the next available surveyor, or choose one yourself.</p>
+      ${(() => { const f = favFor(p, cur); return f ? `<div class="favoffer">${avatar(f, 44)}<div style="flex:1"><strong>${ic("heart",16)} Ask your favourite first?</strong><p class="small">${VERIFIERS[f].name} can do this step and is free from ${VERIFIERS[f].next}.</p></div><button class="btn sign small-btn" data-act="requestPerson" data-sid="${f}" data-pid="${p.id}">Ask ${VERIFIERS[f].name.split(" ")[0]}</button></div>`
+        : favs().some(id => lastSurveyor(p) === id) ? `<p class="tiny muted">${ic("heart",14)} Your favourite did the last visit here, so a different professional must check this step.</p>` : ""; })()}
       <div class="btn-row"><button class="btn sign" data-act="book" data-pid="${p.id}" data-mid="${cur.id}" data-type="onsite">${ic("hardhat",22)} Let Macho assign</button>
       <button class="btn ghost" data-act="people" data-pid="${p.id}">${ic("users",22)} Choose a surveyor</button>${videoBtn}</div>`;
   else if(st === "booked") h = `<h2>${ic("calendar",30)} ${ver.name} visits on ${v.scheduled}</h2>
@@ -1867,15 +1993,14 @@ function viewVerifier(){
 }
 const DECLINE = ["Not free that day","Too far from my area","I have a link to this contractor","Fee too low for this job"];
 function jobsHTML(){
-  const me = VERIFIERS[ui.signedIn], mine = S.visits.filter(v => v.verifierId === ui.signedIn);
+  const sid = ui.signedIn, me = VERIFIERS[sid], mine = S.visits.filter(v => v.verifierId === sid);
   const active = mine.filter(v => ["assigned","inprogress","returned"].includes(v.status)), sent = mine.filter(v => v.status === "submitted");
-  const inbox = reqs().filter(r => r.sid === ui.signedIn && r.status === "pending");
-  reqs().filter(r => r.sid === ui.signedIn).forEach(r => msgs().forEach(m => { if(m.thread === reqThread(r) && m.from === "client" && !m.seenAt) m.seenAt = now(); }));
-  const past = reqs().filter(r => r.sid === ui.signedIn && ["accepted","declined"].includes(r.status)).slice().reverse();
-  if(!ui.vTab) ui.vTab = inbox.length ? "requests" : "visits";
+  const inbox = reqs().filter(r => r.sid === sid && r.status === "pending");
+  const past = reqs().filter(r => r.sid === sid && ["accepted","declined"].includes(r.status)).slice().reverse();
+  if(!ui.vTab || ui.vTab === "requests" || ui.vTab === "visits") ui.vTab = ui.vTab === "visits" || ui.vTab === "requests" ? "jobs" : "jobs";
   const tab = ui.vTab;
   const card = v => { const m = mById(v.milestoneId), p = pById(v.projectId);
-    return `<button class="block job-card" data-act="openJob" data-vid="${v.id}"><strong>${m.name}</strong> <span class="pill ${v.status === "returned" ? "issue" : v.status === "assigned" ? "wait" : ""}">${{assigned:"New", inprogress:"In progress", returned:"Sent back", submitted:"Being reviewed"}[v.status]}</span>
+    return `<button class="block job-card" data-act="openJob" data-vid="${v.id}"><strong>${m.name}</strong> <span class="pill ${v.status === "returned" ? "issue" : v.status === "assigned" ? "wait" : ""}">${{assigned:"Booked", inprogress:"In progress", returned:"Sent back", submitted:"Being reviewed"}[v.status]}</span>
       <div class="small muted" style="margin-top:4px">${ic("pin",16)} ${esc(p.town)}, ${esc(p.county)}</div>
       <div class="small muted">${ic(v.type === "onsite" ? "calendar" : "video",16)} ${v.type === "onsite" ? "Onsite visit" : "Video check-in"}, ${v.scheduled}</div></button>`; };
   const reqCard = r => { const p = pById(r.pid), m = mById(r.mid), fee = r.type === "onsite" ? me.fee : me.video, dec = ui.declining === r.id;
@@ -1883,6 +2008,7 @@ function jobsHTML(){
     return `<article class="block reqcard">
       <div class="req-head"><span class="pill wait">New request</span><span class="small muted">Sent ${r.sentAt}</span></div>
       <h2 style="margin-top:8px">${r.type === "onsite" ? (activeFix(p, r.mid) ? "Re-check after fixes: " : "Stage visit: ") + m.name : "Video check-in: " + m.name}</h2>
+      ${isClientFav(ui.signedIn) ? `<p class="small favnote">${ic("heart",16)} You’re one of ${OWNER.first}’s favourite professionals.</p>` : ""}
       <p class="small">From <strong>${OWNER.first}</strong>, living in ${OWNER.city || "Houston"}. ${esc(p.name)}.</p>
       <dl class="req-facts">
         <dt>${ic("pin",18)}</dt><dd>${esc(p.plot)}, ${esc(p.town)}, ${esc(p.county)}</dd>
@@ -1902,19 +2028,20 @@ function jobsHTML(){
   const pastRow = r => { const p = pById(r.pid), m = mById(r.mid);
     return `<li><div class="r-main"><div><div class="r-title">${r.type === "onsite" ? m.name + " visit" : "Video check-in"}, ${esc(p.town)}</div><div class="small muted">${r.date}, ${r.time}${r.why ? ". " + esc(r.why) : ""}</div></div></div>
       <span class="pill ${r.status === "accepted" ? "pass" : "issue"}">${r.status === "accepted" ? "Accepted" : "Declined"}</span></li>`; };
-  const t = (k, label, n) => `<button role="tab" data-act="vTab" data-t="${k}" aria-selected="${tab === k}">${label}${n ? ` <span class="count">${n}</span>` : ""}</button>`;
-  return `<div class="me-row">${avatar(ui.signedIn, 52)}<div><h1 class="job-title" style="margin:0">${me.name}</h1><p class="muted small">${me.role}, ${me.reg}</p></div></div>
-    <details class="roleinfo rolebox"><summary><strong>Your role: ${me.role}</strong> <span class="small muted">(tap to read)</span></summary>
-      <p class="small">${ROLE_INFO[me.role].does}</p><p class="small"><strong>Rule:</strong> ${ROLE_INFO[me.role].never}</p>
-      <p class="small">You take jobs for: ${me.services.map(k => ({build:"building projects", land:"land purchases", home:"house and flat purchases"})[k]).join(", ")}.</p>
-      <p class="small" style="margin-top:8px"><strong>Everyone on Macho</strong></p>
-      <ul class="plain small">${Object.entries(ROLE_INFO).map(([r, i]) => `<li><strong>${r}:</strong> ${i.does}</li>`).join("")}</ul></details>
-    <div class="tabs" role="tablist">${t("requests", "Requests", inbox.length)}${t("visits", "To do", active.length)}${t("projects", "Projects", 0)}${t("earnings", "Earnings", 0)}</div>
-    ${tab === "projects" ? proProjectsHTML() : tab === "earnings" ? proEarningsHTML() : tab === "requests" ? `
-      ${inbox.length ? inbox.map(reqCard).join("") : `<div class="block"><p class="empty-msg">No new requests. When a client picks you from the Find a professional page, the request arrives here.</p></div>`}
-      ${past.length ? `<h2 class="sub-h">Answered</h2><div class="block"><ul class="rows">${past.map(pastRow).join("")}</ul></div>` : ""}`
-    : `${active.length ? active.map(card).join("") : `<div class="block"><p class="empty-msg">No visits booked. Accepted requests and visits Macho assigns to you appear here.</p></div>`}
-      ${sent.length ? `<h2 class="sub-h">Sent for review</h2>${sent.map(card).join("")}` : ""}`}`;
+  const t = (k, label, icon, n) => `<button role="tab" data-act="vTab" data-t="${k}" aria-selected="${tab === k}">${ic(icon,22)}<span>${label}</span>${n ? `<span class="count">${n}</span>` : ""}</button>`;
+  const body = tab === "projects" ? proProjectsHTML() : tab === "earnings" ? proEarningsHTML() : tab === "messages" ? proMessagesHTML() : tab === "profile" ? proProfileHTML()
+    : `${me.away ? `<div class="callout bad">${ic("clock",22)}<p>You’re set as <strong>not taking new jobs</strong>, so clients can’t request you. <button class="linkish" data-act="vTab" data-t="profile">Change this in Profile</button></p></div>` : ""}
+      <div class="viewswitch" role="group" aria-label="Show jobs as">${[["list","List","list"],["cal","Calendar","calendar"]].map(([k, t, i]) => `<button data-act="jobView" data-v="${k}" aria-pressed="${(ui.jobView || "list") === k}">${ic(i,18)} ${t}</button>`).join("")}</div>
+      ${ui.jobView === "cal" ? proCalendarHTML() : `
+      <h2 class="sub-h">New requests${inbox.length ? ` (${inbox.length})` : ""}</h2>
+      ${inbox.length ? inbox.map(reqCard).join("") : `<div class="block"><p class="empty-msg">No new requests. When a client picks you from Find a professional, it arrives here.</p></div>`}
+      <h2 class="sub-h">To do${active.length ? ` (${active.length})` : ""}</h2>
+      ${active.length ? active.map(card).join("") : `<div class="block"><p class="empty-msg">No visits booked. Accepted requests and visits Macho assigns to you appear here.</p></div>`}
+      ${sent.length ? `<h2 class="sub-h">With the review desk</h2>${sent.map(card).join("")}` : ""}
+      ${past.length ? `<details class="block" style="margin-top:16px"><summary><strong>Requests you answered (${past.length})</strong></summary><ul class="rows" style="margin-top:8px">${past.map(pastRow).join("")}</ul></details>` : ""}`}`;
+  return `<div class="me-row">${avatar(sid, 52)}<div><h1 class="job-title" style="margin:0">${me.name}</h1><p class="muted small">${me.role}, ${me.reg}</p></div></div>
+    <div class="tabs pro-tabs" role="tablist">${t("jobs","Jobs","briefcase",inbox.length + active.filter(v => v.status === "returned").length)}${t("projects","Projects","folder",0)}${t("messages","Messages","inbox",proUnread(sid))}${t("earnings","Earnings","wallet",0)}${t("profile","Profile","user",0)}</div>
+    ${body}`;
 }
 const PIPE = ["Booked","On site","In review","Approved","Paid"];
 function pipeline(v){
@@ -1994,7 +2121,7 @@ function proEarningsHTML(){
     <div class="estats" style="margin-top:10px">
       <div class="stat"><strong>${st.firstPct == null ? "–" : st.firstPct + "%"}</strong><span>reports approved first time</span></div>
       <div class="stat"><strong>${st.qual == null ? "–" : st.qual + " / 4"}</strong><span>average review rating</span></div>
-      <div class="stat"><strong>${me.rating.toFixed(1)}</strong><span>client rating, ${me.reviews} reviews</span></div></div>
+      <div class="stat"><strong>${rt(me)}</strong><span>client rating, ${me.reviews} reviews</span></div></div>
     <div class="callout small">${ic("wallet",22)}<p>You receive ${Math.round(PRO_SHARE * 100)}% of each fee. Fees are paid every ${PAY_DAY} by M-Pesa to your number ending ${me.phone.replace(/\D/g, "").slice(-3)}, for every report approved by then.</p></div>
     ${pending.length ? `<h2 class="sub-h">Not yet approved</h2><div class="block"><ul class="rows">${pending.map(v => `<li><div class="r-main"><div><div class="r-title">${mById(v.milestoneId).name}, ${esc(pById(v.projectId).town)}</div><div class="small muted">${v.status === "returned" ? "Sent back: fix it to get paid" : "With the review desk"}</div></div></div><strong>${money(netOf(v))}</strong></li>`).join("")}</ul></div>` : ""}
     <h2 class="sub-h">Payments</h2>
@@ -2003,6 +2130,120 @@ function proEarningsHTML(){
         <span style="text-align:right"><strong>${money(netOf(v))}</strong><br><span class="pill ${v.payout.status === "paid" ? "pass" : "wait"}">${v.payout.status === "paid" ? "Paid" : "Processing"}</span></span></li>`).join("")}</ul></div>`
       : `<div class="block"><p class="empty-msg">No payments yet. Your first fee is paid on the ${PAY_DAY} after your first report is approved.</p></div>`}
     <div class="btn-row"><button class="btn ghost" data-act="statement">${ic("doc",20)} Download a statement</button></div>`;
+}
+/* Each professional’s inbox, built from what has happened to their work (runs once, after everything is set up) */
+function seedProFeed(st){
+  const feed = (sid, at, text, extra) => st.messages.push(Object.assign({ thread:"pro-" + sid, from:"macho", text, at, read:!/^1[01] Nov 2026/.test(at) }, extra || {}));
+  st.visits.forEach(v => { const m = mById(v.milestoneId), p = st.projects.find(x => x.id === v.projectId); if(!m || !p) return;
+    (v.history || []).forEach(h => feed(v.verifierId, h.at, h.outcome === "approved" ? `Your report for ${m.name.toLowerCase()} at ${p.town} was approved, scoring ${scoreOf(v)} out of 100.${h.note ? " Note: " + h.note : ""}` : `Your report for ${m.name.toLowerCase()} at ${p.town} was sent back: ${h.note}`, { vid:v.id }));
+    if(v.payout && v.payout.status === "paid") feed(v.verifierId, v.payout.on, `Paid ${money(netOf(v))} by M-Pesa for ${m.name.toLowerCase()} at ${p.town}. Ref. ${v.payout.ref}.`, { tab:"earnings" }); });
+  st.requests.filter(r => r.status === "pending").forEach(r => { const p = st.projects.find(x => x.id === r.pid);
+    feed(r.sid, r.sentAt + ", 08:41", `New request from ${OWNER.first}: ${mById(r.mid).name.toLowerCase()} visit at ${p.town}, ${r.date}, ${r.time}. Accept or decline it in Jobs.`, { tab:"jobs" }); });
+}
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+function dayKey(str){ const m = String(str).match(/(\d{1,2}) (\w{3,4}) (\d{4})/); if(!m) return null; const d = new Date(Date.parse(`${m[1]} ${m[2].slice(0, 3)} ${m[3]}`)); return isNaN(d) ? null : ymd(d); }
+const timeOf = str => (String(str).match(/(\d{1,2}:\d{2})/) || [,""])[1];
+function proCalendarHTML(){
+  const sid = ui.signedIn, items = [];
+  S.visits.filter(v => v.verifierId === sid && ["assigned","inprogress","returned"].includes(v.status)).forEach(v => items.push({ day:dayKey(v.scheduled), time:timeOf(v.scheduled), v, p:pById(v.projectId), m:mById(v.milestoneId), kind:"visit" }));
+  reqs().filter(r => r.sid === sid && r.status === "pending").forEach(r => items.push({ day:dayKey(r.date), time:r.time, r, p:pById(r.pid), m:mById(r.mid), kind:"request" }));
+  const start = new Date(); start.setHours(0, 0, 0, 0);
+  const days = Array.from({ length:14 }, (_, i) => { const d = new Date(start); d.setDate(d.getDate() + i); return d; });
+  const later = items.filter(x => !x.day || x.day < ymd(days[0]) || x.day > ymd(days[13]));
+  const week = items.filter(x => x.day && x.day <= ymd(days[6]) && x.kind === "visit");
+  const towns = [...new Set(week.map(x => x.p.county))];
+  const row = x => `<button class="calitem ${x.kind}" data-act="${x.kind === "visit" ? "openJob" : "jobView"}" ${x.kind === "visit" ? `data-vid="${x.v.id}"` : `data-v="list"`}>
+      <span class="caltime">${x.time || "–"}</span><span><strong>${x.m.name}${x.kind === "request" ? " (request, not yet accepted)" : x.v.type === "video" ? " (video)" : ""}</strong>
+      <span class="small muted" style="display:block">${ic("pin",14)} ${esc(x.p.town)}, ${esc(x.p.county)}${x.kind === "visit" && x.v.status === "returned" ? ". Sent back: fix the report" : ""}</span></span></button>`;
+  return `<p class="small" style="margin-top:12px">${week.length ? `This week: <strong>${week.length} ${week.length > 1 ? "visits" : "visit"}</strong> in ${towns.join(" and ")}.` : "Nothing booked this week."} Requests you haven’t accepted are shown in yellow.</p>
+    <ol class="cal">${days.map(d => { const k = ymd(d), here = items.filter(x => x.day === k).sort((a, b) => a.time.localeCompare(b.time)), wknd = d.getDay() === 0;
+      return `<li class="${here.length ? "busy" : ""} ${wknd ? "sun" : ""}"><span class="caldate"><strong>${d.getDate()}</strong><span>${d.toLocaleDateString("en-GB", { weekday:"short" })}</span></span>
+        <span class="calday">${here.length ? here.map(row).join("") : `<span class="small muted">${wknd ? "Sunday: no visits" : "Free"}</span>`}</span></li>`; }).join("")}</ol>
+    ${later.length ? `<h2 class="sub-h">Later</h2>${later.map(row).join("")}` : ""}
+    <p class="tiny muted" style="margin-top:10px">Tip: group visits in the same county on the same day to save travel time.</p>`;
+}
+function proBubble(m){
+  if(m.from === "system") return `<p class="sysmsg">${esc(m.text)} <span class="tiny muted">${esc(m.at)}</span></p>`;
+  const mine = m.from === "surveyor";
+  const img = m.img ? `<img class="bub-img" src="${m.img.kind === "img" ? m.img.src : (ART[m.img.art] || ART.document)()}" alt="Photo">` : "";
+  const loc = m.loc ? locHTML(m.loc, false) : "";
+  const link = m.vid && vById(m.vid) && vById(m.vid).verifierId === ui.signedIn ? `<button class="btn ghost small-btn" style="margin-top:8px" data-act="openProProj" data-pid="${vById(m.vid).projectId}">${ic("folder",18)} See it in Projects</button>`
+    : m.tab ? `<button class="btn ghost small-btn" style="margin-top:8px" data-act="vTab" data-t="${m.tab}">Open ${m.tab === "jobs" ? "Jobs" : m.tab === "earnings" ? "Earnings" : "it"}</button>` : "";
+  return `<div class="bub ${mine ? "me" : ""}"><div class="bub-in" data-notr>${img}${loc}${esc(m.text)}${link}</div>
+    <span class="bub-meta"><span class="tiny muted">${esc(m.at)}</span>${m.from === "macho" && proAlert(ui.signedIn, "wa") ? `<span class="tiny muted">${ic("chat",13)} Also sent to your WhatsApp</span>` : ""}${m.from === "macho" && proAlert(ui.signedIn, "sms") ? `<span class="tiny muted">and by SMS</span>` : ""}</span></div>`;
+}
+function proMessagesHTML(){
+  const sid = ui.signedIn, me = VERIFIERS[sid];
+  const reqTs = reqs().filter(r => r.sid === sid).map(r => ({ id:reqThread(r), r }));
+  const all = [{ id:proThread(sid), feed:true }].concat(reqTs).filter(t => msgs().some(m => m.thread === t.id));
+  const lastIdx = t => { let k = -1; msgs().forEach((m, i) => { if(m.thread === t.id) k = i; }); return k; };
+  all.sort((a, b) => lastIdx(b) - lastIdx(a));
+  const cur = ui.pThread && all.find(t => t.id === ui.pThread);
+  if(cur){
+    msgs().forEach(m => { if(m.thread === cur.id){ if(cur.feed) m.read = true; else if(m.from === "client" && !m.seenAt) m.seenAt = now(); } });
+    save();
+    const list = msgs().filter(m => m.thread === cur.id);
+    const head = cur.feed ? `<div class="th-head"><span class="pav" style="background:var(--sign);color:#16212B">${ic("hardhat",22)}</span><div><h2 style="margin:0">Macho</h2><p class="small muted">Requests, review decisions, payments and disputes</p></div></div>`
+      : (() => { const p = pById(cur.r.pid), m = mById(cur.r.mid);
+        return `<div class="th-head"><span class="avatar">${OWNER.initials}</span><div><h2 style="margin:0">${OWNER.first} ${STATUS_PILL[cur.r.status]}</h2><p class="small muted">${esc(p.name)}, ${esc(p.town)}: ${cur.r.type === "onsite" ? m.name.toLowerCase() + " visit" : "video check-in"} on ${cur.r.date}</p></div></div>`; })();
+    const canWrite = !cur.feed && ["pending","accepted"].includes(cur.r.status);
+    return `<button class="back" data-act="pThreadBack" style="margin-top:12px">${ic("back",20)} All messages</button>
+      <div class="block">${head}<div class="msgs" id="msgs">${list.map(proBubble).join("")}</div>
+      ${canWrite ? `<div class="quick" aria-label="Quick replies">${["On my way","Arrived at the gate","Running 20 minutes late","On site now, starting the checks","Finished. Report coming today"].map(q => `<button data-act="quickReply" data-t="${cur.id}" data-v="${q}">${q}</button>`).join("")}</div>
+        <div class="composer-wrap"><div class="composer"><textarea rows="2" id="composer" aria-label="Write to ${OWNER.first}" placeholder="Write to ${OWNER.first}"></textarea>
+        <div class="composer-btns"><label class="btn ghost small-btn">${ic("camera",18)} Photo<input class="sr" type="file" accept="image/*" data-field="proPhoto" data-t="${cur.id}"></label>
+        <button class="btn sign" data-act="proSend" data-t="${cur.id}">${ic("send",20)} Send</button></div></div>
+        <p class="tiny muted">Messages stay with the project record. Never share your personal number or ask to be paid outside Macho.</p></div>`
+        : cur.feed ? `<p class="tiny muted" style="margin-top:10px">These notices are sent automatically. Questions? Use the help desk.</p>` : ""}</div>`;
+  }
+  return `<p class="small muted" style="margin:12px 2px 0">Messages from clients, and notices from Macho about your requests, reviews and payments.</p>
+    ${all.length ? `<div class="block" style="padding:6px">${all.map(t => { const last = msgs().filter(m => m.thread === t.id).slice(-1)[0];
+      const u = t.feed ? msgs().filter(m => m.thread === t.id && !m.read).length : msgs().filter(m => m.thread === t.id && m.from === "client" && !m.seenAt).length;
+      return `<button class="trow" data-act="pThread" data-t="${t.id}">${t.feed ? `<span class="pav" style="background:var(--sign);color:#16212B">${ic("hardhat",22)}</span>` : `<span class="avatar" style="width:46px;height:46px">${OWNER.initials}</span>`}
+        <span class="trow-main"><span class="trow-top"><strong>${t.feed ? "Macho" : OWNER.first + ", " + esc(pById(t.r.pid).town)}</strong><span class="tiny muted">${esc(String(last.at).split(",")[0])}</span></span>
+        ${t.feed ? "" : `<span class="trow-pill">${STATUS_PILL[t.r.status]}</span>`}
+        <span class="small trow-last ${u ? "unread" : ""}">${last.from === "surveyor" ? "You: " : ""}${esc(last.text || (last.loc ? "Site pin" : last.img ? "Photo" : ""))}</span></span>${u ? `<span class="dot"></span>` : ""}</button>`; }).join("")}</div>`
+      : `<div class="block"><p class="empty-msg">No messages yet.</p></div>`}`;
+}
+
+/* ---------- professional profile ---------- */
+function proProfileHTML(){
+  const sid = ui.signedIn, x = VERIFIERS[sid], e = ui.pEdit;
+  const dates = bookingDates().map(d => d.replace(/ \d{4}$/, ""));
+  if(!e) return `<div class="block" style="margin-top:14px">
+      <div class="person-top">${avatar(sid, 64)}<div><h2 style="margin:0;font-size:1.6rem">${x.name}</h2><p class="muted">${x.role}, ${x.years} ${x.years === 1 ? "year" : "years"}’ experience</p></div></div>
+      <p style="margin-top:12px">${esc(x.bio)}</p>
+      <div class="pstats" style="margin-top:12px"><div><strong>${x.visits}</strong><span>Macho visits</span></div><div><strong>${rt(x)}</strong><span>client rating</span></div><div><strong>${money(x.fee)}</strong><span>per site visit</span></div></div>
+      <ul class="plain small" style="margin-top:12px"><li>Works in ${x.counties.join(", ")}</li><li>Speaks ${x.langs.join(", ")}</li>${x.skills.length ? `<li>Good at ${x.skills.join(", ").toLowerCase()}</li>` : ""}<li>Video check-in ${money(x.video)}</li><li>${x.away ? "<strong>Not taking new jobs</strong>" : `Taking new jobs. Next free ${x.next}`}</li></ul>
+      <div class="btn-row"><button class="btn sign" data-act="pEdit">${ic("pencil",20)} Edit profile</button><button class="btn ghost" data-act="viewPerson" data-sid="${sid}">See it as clients do</button></div></div>
+    <div class="block"><h2>${ic("shield",22)} Checked by Macho</h2>
+      <ul class="checks small"><li><span class="tick">${ic("check",14)}</span><span>${x.reg}${x.body ? `, ${x.body}` : ""}</span></li>${STD_CHECKS.map(c => `<li><span class="tick">${ic("check",14)}</span><span>${c}</span></li>`).join("")}</ul>
+      <p class="tiny muted">Your name, profession and registration can only be changed through the help desk, because we check them again with your board.</p></div>
+    <div class="block"><h2>${ic("bell",22)} Alerts for new requests and decisions</h2>
+      <p class="small muted">Reply fast: clients usually book the first professional who answers.</p>
+      ${[["wa","WhatsApp","To your number ending " + String(x.phone).replace(/\D/g, "").slice(-3) + ", with a link back to Macho."],["sms","Text message","Short alerts for when you have no data."]].map(([k, t, d]) => { const on = proAlert(sid, k);
+        return `<label class="opt"><input type="checkbox" data-field="proAlert" data-k="${k}" ${on ? "checked" : ""}><span><strong>${t}</strong><span class="small muted" style="display:block">${d}</span></span></label>`; }).join("")}
+      <label class="opt"><input type="checkbox" data-field="phoneAlerts" ${LOCALSET.phoneAlerts ? "checked" : ""}><span><strong>Alerts on this phone</strong><span class="small muted" style="display:block">${typeof Notification === "undefined" ? "This browser can’t show alerts." : Notification.permission === "denied" ? "Blocked in your browser settings. Allow notifications for this site to turn them on." : "Pops up even when Macho is in the background, while the page is open."}</span></span></label></div>
+    <div class="block"><h2>${ic("wallet",22)} Payouts</h2><p class="small">M-Pesa, to your number ending ${String(x.phone).replace(/\D/g, "").slice(-3)}, every ${PAY_DAY}.</p>
+      <div class="btn-row"><button class="btn ghost small-btn" data-act="payoutChange">Change payout number</button></div></div>
+    <div class="block"><h2>${ic("lock",22)} Account</h2><p class="small">Signed in${SESSION ? ` with ${esc(SESSION.phone)}` : " (demo)"}.</p>${SESSION ? `<div class="btn-row"><button class="btn ghost small-btn" data-act="signOut">Sign out</button></div>` : ""}</div>`;
+  const cty = ALLCOUNTIES;
+  return `<div class="block" style="margin-top:14px"><h2>${ic("pencil",22)} Edit your profile</h2><p class="small muted">Clients see this when choosing who to request.</p>
+    <div class="fields" style="grid-template-columns:1fr">
+      <label class="field">About you<textarea rows="4" id="pe-bio">${esc(e.bio)}</textarea></label>
+      <label class="field">What you’re good at (separate with commas)<input type="text" id="pe-skills" value="${esc(e.skills.join(", "))}"></label>
+      <label class="field">Languages (separate with commas)<input type="text" id="pe-langs" value="${esc(e.langs.join(", "))}"></label>
+      <label class="field">Years of experience<input type="number" id="pe-years" min="0" max="60" value="${e.years}"></label></div>
+    <h3 class="modal-sub" style="font-size:1.15rem">Counties you work in</h3>
+    <div class="chips pick">${cty.map(c => `<button data-act="peCounty" data-v="${c}" aria-pressed="${e.counties.includes(c)}">${e.counties.includes(c) ? ic("check",16) : ""}${c}</button>`).join("")}</div>
+    <h3 class="modal-sub" style="font-size:1.15rem">Your fees</h3>
+    <div class="fields"><label class="field">Site visit (KSh)<input type="number" id="pe-fee" min="1000" step="500" value="${e.fee}"></label><label class="field">Video check-in (KSh)<input type="number" id="pe-video" min="500" step="500" value="${e.video}"></label></div>
+    <p class="tiny muted">Clients pay this. You receive ${Math.round(PRO_SHARE * 100)}%.</p>
+    <h3 class="modal-sub" style="font-size:1.15rem">Availability</h3>
+    <label class="opt"><input type="checkbox" id="pe-away" ${e.away ? "" : "checked"}><span><strong>Taking new jobs</strong><span class="small muted" style="display:block">Untick when you’re away. Clients can still see your profile but can’t request you, and Macho won’t assign you.</span></span></label>
+    <div class="fields"><label class="field">Next free day<select id="pe-next">${dates.map(d => `<option ${d === e.next ? "selected" : ""}>${d}</option>`).join("")}${dates.includes(e.next) ? "" : `<option selected>${esc(e.next)}</option>`}</select></label></div>
+    <p id="pe-err" class="note" role="alert"></p>
+    <div class="btn-row"><button class="btn sign" data-act="peSave">${ic("check",20)} Save changes</button><button class="btn ghost" data-act="peCancel">Cancel</button></div></div>`;
 }
 function missing(v){
   const m = mById(v.milestoneId), out = [];
@@ -2080,14 +2321,10 @@ function autoChecks(v){
     [prevVerifier(v) !== v.verifierId, "Different surveyor from the previous visit"]
   ];
 }
-function viewReview(){
-  const q = S.visits.filter(v => v.status === "submitted"), done = S.visits.filter(v => v.reviewedAt).slice().reverse().slice(0, 6);
-  const row = (v, btn) => { const p = pById(v.projectId); return `<li><div class="r-main">${ic(v.type === "video" ? "video" : "clipboard",24)}<div><div class="r-title">${mById(v.milestoneId).name}</div><div class="small muted">${esc(p.town)}, ${VERIFIERS[v.verifierId].name}</div></div></div>${btn}</li>`; };
-  const v = ui.rVisit && vById(ui.rVisit);
-  let detail = `<div class="card"><p class="muted">Pick a report from the list to review it.</p></div>`;
-  if(v && v.status === "submitted"){
-    const p = pById(v.projectId);
-    detail = `<div class="card"><h2>${mById(v.milestoneId).name}</h2><p class="muted small">${esc(p.name)}, ${esc(p.town)}. Sent ${esc(v.submittedAt)}.</p>
+function reviewDetail(v){
+  const p = pById(v.projectId), m = mById(v.milestoneId), x = VERIFIERS[v.verifierId];
+  const head = `<button class="back" data-act="closeReview">${ic("back",20)} Review desk</button>`;
+  if(v.status === "submitted") return head + `<div class="review-detail">` + `<div class="card"><h2>${mById(v.milestoneId).name}</h2><p class="muted small">${esc(p.name)}, ${esc(p.town)}. Sent ${esc(v.submittedAt)}.</p>
       <h3 style="font-size:1.3rem;margin:18px 0 6px">Automatic checks</h3>
       <ul class="checks">${autoChecks(v).map(([ok, t]) => `<li><span class="tick ${ok ? "" : "no"}">${ic(ok ? "check" : "cross",16)}</span><span>${t}<span class="sr">${ok ? " (passed)" : " (failed)"}</span></span></li>`).join("")}</ul></div>
       <div class="card" style="margin-top:16px">${reportBody(v)}</div>
@@ -2096,17 +2333,79 @@ function viewReview(){
         <p class="small" style="margin-top:10px"><strong>Rate the work</strong> (the professional sees this)</p>
         <div class="chips pick">${QUAL.map(([k, t]) => { const on = !(ui.rq && ui.rq[k] === false); return `<button data-act="rqual" data-k="${k}" aria-pressed="${on}">${on ? ic("check",16) : ic("cross",16)} ${t}</button>`; }).join("")}</div>
         <textarea rows="3" data-field="reviewNote" data-vid="${v.id}" aria-label="Review note" placeholder="Note for the professional or client">${esc(v.reviewNoteDraft)}</textarea>
-        <div class="btn-row"><button class="btn sign" data-act="approve" data-vid="${v.id}">${ic("check",22)} Approve and send to client</button><button class="btn danger" data-act="sendBack" data-vid="${v.id}">Send back to surveyor</button></div></div>`;
+        <div class="btn-row"><button class="btn sign" data-act="approve" data-vid="${v.id}">${ic("check",22)} Approve and send to client</button><button class="btn danger" data-act="sendBack" data-vid="${v.id}">Send back to surveyor</button></div></div>` + `</div>`;
+  ensureVisitRecord(v);
+  return head + `<div class="review-detail"><div class="card"><h2>${m.name}${v.type === "video" ? " (video)" : ""}</h2>
+      <p class="muted small">${esc(p.name)}, ${esc(p.town)}. ${x.name}, ${x.role.toLowerCase()}.</p>
+      ${pipeline(v)}${feedbackHTML(v)}${v.status === "approved" ? payLine(v) : `<p class="small">${ic("clock",16)} Waiting for ${x.name.split(" ")[0]} to fix and resend.</p>`}</div>
+    <div class="card" style="margin-top:16px">${reportBody(v)}</div></div>`;
+}
+function viewReview(){
+  const v = ui.rVisit && vById(ui.rVisit);
+  if(v) return reviewDetail(v);
+  const T = ui.rtab || "todo", vs = S.visits.map(x => x.status === "approved" ? ensureVisitRecord(x) : x);
+  const todo = vs.filter(x => x.status === "submitted"), back = vs.filter(x => x.status === "returned"), appr = vs.filter(x => x.status === "approved");
+  const month = new Date().toLocaleDateString("en-GB", {month:"short", year:"numeric"});
+  const apprMonth = appr.filter(x => String(x.reviewedAt).includes(month));
+  const firstOK = appr.filter(x => !(x.history || []).some(h => h.outcome === "returned")).length;
+  const owed = appr.filter(x => x.payout.status === "processing");
+  const openCases = cases().filter(c => c.step < 3);
+  const kpi = (n, t, k, tone) => `<button class="kpi ${tone || ""} ${T === k ? "on" : ""}" data-act="rtab" data-v="${k}"><strong>${n}</strong><span>${t}</span></button>`;
+  const row = (x, extra) => { const p = pById(x.projectId), m = mById(x.milestoneId), pr = VERIFIERS[x.verifierId];
+    return `<li><div class="r-main">${avatar(x.verifierId, 40)}<div><div class="r-title">${m.name}${x.type === "video" ? " (video)" : ""}, ${esc(p.town)}</div>
+      <div class="small muted">${pr.name}, ${pr.role.toLowerCase()}. ${extra || ""}</div></div></div>
+      <button class="btn ${x.status === "submitted" ? "sign" : "ghost"} small-btn" data-act="openReview" data-vid="${x.id}">${x.status === "submitted" ? "Review" : "View"}</button></li>`; };
+  const when = x => esc(String(x.reviewedAt || x.submittedAt || "").split(",")[0]);
+  let list = "";
+  if(T === "todo") list = todo.length ? `<ul class="rows">${todo.map(x => row(x, `Sent ${esc(x.submittedAt)}. ${(x.history || []).some(h => h.outcome === "returned") ? "<strong>Resent after fixes.</strong>" : ""}`)).join("")}</ul>`
+    : `<p class="empty-msg">Nothing waiting. Reports arrive here when a professional sends a visit.</p>`;
+  if(T === "back") list = back.length ? `<ul class="rows">${back.map(x => row(x, `Sent back ${when(x)}: “${esc(x.reviewNote)}”`)).join("")}</ul>`
+    : `<p class="empty-msg">No reports are waiting for a professional to fix them.</p>`;
+  if(T === "done") list = appr.length ? `<ul class="rows">${appr.slice().sort((a, b) => (Date.parse(String(b.reviewedAt).split(",")[0]) || 0) - (Date.parse(String(a.reviewedAt).split(",")[0]) || 0)).map(x => row(x, `Approved ${when(x)}. Scored ${scoreOf(x)}/100. ${(x.history || []).some(h => h.outcome === "returned") ? "Sent back once." : "First time."} ${x.payout.status === "paid" ? "Paid." : "Fee to pay."}`)).join("")}</ul>`
+    : `<p class="empty-msg">Nothing approved yet.</p>`;
+  if(T === "cases") list = cases().length ? `<ul class="rows">${cases().slice().reverse().map(c => { const p = pById(c.pid), m = mById(c.mid);
+      return `<li><div class="r-main">${ic("help",24)}<div><div class="r-title">${m.name}, ${esc(p.town)} <span class="pill ${c.step < 3 ? "wait" : "pass"}">${c.step < 3 ? "Open" : "Closed"}</span></div>
+        <div class="small muted">Client disputes ${c.items.length} ${c.items.length > 1 ? "checks" : "check"}: “${esc(c.text)}”. Wants ${c.want === "visit" ? "a second visit" : "a senior review"}.</div>
+        ${c.step < 3 ? `<div class="btn-row" style="margin-top:6px"><button class="btn ghost small-btn" data-act="openReview" data-vid="${c.vid}">See the report</button><button class="btn sign small-btn" data-act="caseNext" data-cid="${c.id}">Move to next step</button></div>` : ""}</div></div></li>`; }).join("")}</ul>`
+    : `<p class="empty-msg">No disputes. When a client disagrees with a report, the case appears here.</p>`;
+  if(T === "pay") list = `${owed.length ? `<p class="small">${owed.length} approved ${owed.length > 1 ? "reports" : "report"}, ${money(owed.reduce((a, x) => a + netOf(x), 0))} to pay on ${nextPayDay()} by M-Pesa.</p>
+      <ul class="rows">${owed.map(x => `<li><div class="r-main">${avatar(x.verifierId, 40)}<div><div class="r-title">${VERIFIERS[x.verifierId].name}</div><div class="small muted">${mById(x.milestoneId).name}, ${esc(pById(x.projectId).town)}. Approved ${when(x)}.</div></div></div><strong>${money(netOf(x))}</strong></li>`).join("")}</ul>
+      <div class="btn-row"><button class="btn sign" data-act="payAll">${ic("wallet",20)} Prototype: pay them now</button></div>` : `<p class="empty-msg">Nothing to pay. Fees are paid every ${PAY_DAY} after approval.</p>`}
+    ${(() => { const paid = appr.filter(x => x.payout.status === "paid"); return paid.length ? `<p class="small muted" style="margin-top:12px">${money(paid.reduce((a, x) => a + netOf(x), 0))} paid to professionals so far.</p>` : ""; })()}`;
+  if(T === "pros"){
+    const ids = Object.keys(VERIFIERS).filter(id => vs.some(x => x.verifierId === id));
+    list = `<div class="tablewrap"><table class="ptable"><thead><tr><th>Professional</th><th>Reports approved</th><th>First time</th><th>Waiting / sent back</th><th>Average rating</th><th>Fees owed</th></tr></thead><tbody>
+      ${ids.map(id => { const st = myStats(id), mine = vs.filter(x => x.verifierId === id), x = VERIFIERS[id];
+        const flag = st.firstPct != null && st.firstPct < 80;
+        return `<tr><td><div class="r-main">${avatar(id, 32)}<div><strong>${x.name}</strong><div class="tiny muted">${x.role}</div></div></div></td><td>${st.done}</td>
+          <td class="${flag ? "warn" : ""}">${st.firstPct == null ? "–" : st.firstPct + "%"}</td><td>${mine.filter(y => y.status === "submitted").length} / ${mine.filter(y => y.status === "returned").length}</td>
+          <td>${st.qual == null ? "–" : st.qual + " / 4"}</td><td>${st.waiting ? money(st.waiting) : "–"}</td></tr>`; }).join("")}</tbody></table></div>
+      <p class="tiny muted" style="margin-top:8px">First-time approval below 80% is highlighted: a sign the professional may need coaching.</p>`;
   }
-  return `<div class="review"><section class="review-side"><h1 class="hello" style="font-size:2.4rem">Review desk</h1>
-    <p class="muted" style="margin-top:6px">A second person checks every report before the client sees it.</p><h2>Waiting (${q.length})</h2>
-    ${q.length ? `<ul class="rows">${q.map(x => row(x, `<button class="btn small-btn ${ui.rVisit === x.id ? "" : "ghost"}" data-act="openReview" data-vid="${x.id}">Review</button>`)).join("")}</ul>`
-      : `<p class="empty-msg">No reports waiting. Reports arrive here when a surveyor sends a visit for review.</p>`}
-    ${(() => { const due = S.visits.filter(v => v.status === "approved" && ensureVisitRecord(v).payout.status === "processing");
-      return `<h2>Professionals’ fees to pay</h2>${due.length ? `<p class="small muted">${due.length} approved ${due.length > 1 ? "reports" : "report"}, ${money(due.reduce((a, v) => a + netOf(v), 0))} in total. Paid every ${PAY_DAY} by M-Pesa.</p>
-        <div class="btn-row" style="margin-top:8px"><button class="btn sign small-btn" data-act="payAll">${ic("wallet",18)} Prototype: pay them now</button></div>` : `<p class="empty-msg">Nothing waiting. Fees are paid every ${PAY_DAY} after approval.</p>`}`; })()}
-    <h2>Recently reviewed</h2><ul class="rows">${done.map(x => row(x, `<span class="pill ${x.status === "approved" ? "pass" : "issue"}">${x.status === "approved" ? scoreOf(x) + " / 100" : "Sent back"}</span>`)).join("")}</ul>
-  </section><section>${detail}</section></div>`;
+  if(T === "join"){
+    const list2 = apps().slice().reverse();
+    list = list2.length ? `<ul class="rows">${list2.map(a => `<li style="display:block"><div class="r-main"><span class="pav" style="background:#5B3F8C">${initials(a.name)}</span><div style="flex:1">
+        <div class="r-title">${esc(a.name)} <span class="pill ${a.status === "pending" ? "wait" : a.status === "approved" ? "pass" : "issue"}">${a.status === "pending" ? "Waiting" : a.status === "approved" ? "Approved" : "Not approved"}</span></div>
+        <div class="small muted">${esc(a.role)}, ${esc(a.reg)}. ID ${esc(a.idNo)}. ${esc(a.phone)}. Works in ${esc(a.counties || "not given")}. Applied ${esc(a.at)}.</div>
+        ${a.status === "pending" ? `<ul class="checks small" style="margin-top:8px">${["Registration number found on the board’s public register","Name on the register matches the national ID","ID photo matches a live selfie","M-Pesa number is registered in the same name","Not listed as a contractor, developer or estate seller"].map(c => `<li><span class="tick" style="background:var(--line)">${ic("check",14)}</span><span>${c}</span></li>`).join("")}</ul>
+          <div class="btn-row" style="margin-top:6px"><button class="btn sign small-btn" data-act="apApprove" data-id="${a.id}">${ic("check",18)} Approve</button><button class="btn danger small-btn" data-act="apReject" data-id="${a.id}">Don’t approve</button></div>
+          ${ui.rejecting === a.id ? `<p class="small" style="margin-top:8px"><strong>Why not?</strong> The applicant sees this.</p><div class="chips pick">${["Registration not found on the board’s register","Name doesn’t match the ID","Linked to a contractor, developer or seller","Details incomplete"].map(r => `<button data-act="apRejectWhy" data-id="${a.id}" data-v="${r}">${r}</button>`).join("")}</div>` : ""}` : a.note ? `<p class="small">Reason: ${esc(a.note)}</p>` : ""}</div></div></li>`).join("")}</ul>`
+      : `<p class="empty-msg">No applications. People who sign in as a professional with a new number apply here, and can’t take jobs until approved.</p>`;
+  }
+  const tabs = [["todo","To review",todo.length],["back","Sent back",back.length],["done","Approved",appr.length],["cases","Disputes",openCases.length],["pay","Fees to pay",owed.length],["pros","Professionals",0],["join","Join requests",apps().filter(a => a.status === "pending").length]];
+  return `<h1 class="hello">Review desk</h1>
+    <p class="hello-sub">A second person checks every report before the client sees it.</p>
+    <div class="kpis">
+      ${kpi(todo.length, "waiting for review", "todo", todo.length ? "hot" : "")}
+      ${kpi(back.length, "sent back, waiting for the professional", "back", "")}
+      ${kpi(apprMonth.length, `approved in ${month}`, "done", "")}
+      ${kpi(appr.length ? Math.round(100 * firstOK / appr.length) + "%" : "–", "approved first time", "pros", "")}
+      ${kpi(openCases.length, "open client disputes", "cases", openCases.length ? "hot" : "")}
+      ${kpi(money(owed.reduce((a, x) => a + netOf(x), 0)), "professionals’ fees to pay", "pay", "")}
+      ${kpi(apps().filter(a => a.status === "pending").length, "professionals waiting to join", "join", apps().some(a => a.status === "pending") ? "hot" : "")}
+    </div>
+    <div class="chips pick" style="margin-top:22px" role="tablist">${tabs.map(([k, t, n]) => `<button data-act="rtab" data-v="${k}" aria-pressed="${T === k}">${t}${n ? ` (${n})` : ""}</button>`).join("")}</div>
+    <section class="card" style="margin-top:14px">${list}</section>`;
 }
 
 /* ---------- Modals ---------- */
@@ -2185,7 +2484,7 @@ function renderModal(){
     html = `<div class="person-top" style="padding-right:48px">${avatar(M.sid, 72)}<div><h2 style="font-size:2rem">${x.name}</h2><p class="muted">${x.role}, ${x.years} years’ experience</p></div></div>
       <p style="margin-top:14px">${x.bio}</p>
       <div class="roleinfo" style="margin-top:12px"><strong>What a ${x.role.toLowerCase()} does on Macho</strong><p class="small">${ROLE_INFO[x.role].does}</p><p class="small muted">${ROLE_INFO[x.role].never}</p></div>
-      <div class="pstats" style="margin-top:14px"><div><strong>${x.years}</strong><span>years’ experience</span></div><div><strong>${x.visits}</strong><span>Macho visits</span></div><div><strong>${x.rating.toFixed(1)}</strong><span>rating, ${x.reviews} reviews</span></div></div>
+      <div class="pstats" style="margin-top:14px"><div><strong>${x.years}</strong><span>years’ experience</span></div><div><strong>${x.visits}</strong><span>Macho visits</span></div><div><strong>${rt(x)}</strong><span>rating, ${x.reviews} reviews</span></div></div>
       <h3 class="modal-sub">What Macho has checked</h3>
       <ul class="checks"><li><span class="tick">${ic("check",16)}</span><span>${x.reg}, confirmed with the ${x.body}</span></li>${STD_CHECKS.map(c => `<li><span class="tick">${ic("check",16)}</span><span>${c}</span></li>`).join("")}</ul>
       <h3 class="modal-sub">Good at</h3><div class="chips">${x.skills.map(k => `<span class="chip-static">${k}</span>`).join("")}</div>
@@ -2193,7 +2492,7 @@ function renderModal(){
       <ul class="plain"><li>Works in ${x.counties.join(", ")}</li><li>Speaks ${x.langs.join(", ")}</li><li>${money(x.fee)} per site visit, ${money(x.video)} per video check-in</li><li>Next free ${x.next}. ${x.reply}. ${x.turnaround}.</li></ul>
       <h3 class="modal-sub">What clients say</h3>${x.said.map(([who, t]) => `<blockquote class="quote">“${t}”<cite>${who}</cite></blockquote>`).join("")}
       <div class="callout small">${ic("lock",22)}<p>Phone, WhatsApp and email open once ${x.name.split(" ")[0]} accepts a request. Calls and messages go through Macho, so both your numbers stay private and everything stays with the project record.</p></div>
-      <div class="btn-row"><button class="btn sign" data-act="requestPerson" data-sid="${M.sid}">${ic("calendar",22)} Request ${x.name.split(" ")[0]}</button><button class="btn ghost" data-act="close">Close</button></div>`;
+      <div class="btn-row">${favBtn(M.sid, true)}<button class="btn sign" data-act="requestPerson" data-sid="${M.sid}">${ic("calendar",22)} Request ${x.name.split(" ")[0]}</button><button class="btn ghost" data-act="close">Close</button></div>`;
   }
   if(M.kind === "request"){
     narrow = true;
@@ -2332,7 +2631,21 @@ function renderModal(){
 }
 
 /* ---------- Render ---------- */
+const seenFeed = {};
+function watchProFeed(){
+  if(ui.role !== "verifier" || !ui.signedIn) return;
+  const sid = ui.signedIn, list = msgs().filter(m => m.thread === proThread(sid)), n = list.length;
+  if(seenFeed[sid] != null && n > seenFeed[sid]){
+    const m = list[n - 1];
+    if(document.hidden && LOCALSET.phoneAlerts && typeof Notification !== "undefined" && Notification.permission === "granted"){ try{ new Notification("Macho", { body:m.text }); }catch(e){} }
+    else setTimeout(() => toast("New: " + m.text.slice(0, 90) + (m.text.length > 90 ? "…" : "")), 50);
+  }
+  seenFeed[sid] = n;
+}
 function render(){
+  setTimeout(watchProFeed, 0);
+  if(S.needsFeed){ delete S.needsFeed; seedProFeed(S); save(); }
+  mergePros();
   const signing = needSignIn();
   document.body.classList.toggle("is-client", ui.role === "client" && !signing);
   document.body.classList.toggle("no-bar", !DEMO || !!LOCALSET.hideBar);
@@ -2369,10 +2682,12 @@ const actions = {
     const af = activeFix(p, M.mid);
     if(af && af.status === "fixed" && M.type === "onsite"){ af.status = "recheck"; v.recheck = true; v.fixOf = af.id; }
     S.visits.push(v); reqs().forEach(r => { if(r.pid === p.id && r.mid === M.mid && r.status === "declined") r.seen = true; });
+    proPost(v.verifierId, `Macho has booked you for the ${M.type === "onsite" ? mById(M.mid).name.toLowerCase() + " visit" : "video check-in"} at ${p.town} on ${v.scheduled}. It’s in Jobs.`, { tab:"jobs" });
     post("updates", "macho", `Macho assigned ${VERIFIERS[v.verifierId].name} for the ${M.type === "onsite" ? mById(M.mid).name.toLowerCase() + " visit" : "video check-in"} at ${p.town} on ${v.scheduled}.`, {pid:p.id, read:true});
     ui.modal = null; commit(`Booked. ${VERIFIERS[v.verifierId].name} will visit on ${v.scheduled}.`); },
   askPay(d){ ui.modal = {kind:"pay", pid:d.pid, mid:d.mid}; renderModal(); },
-  confirmPay(d){ const p = pById(d.pid), m = mById(d.mid), a = amt(p, m.id); p.paid[m.id] = today(); ui.modal = null; ui.shot[p.id] = null; post("updates", "macho", a ? `You approved ${money(a)} for ${m.name.toLowerCase()} at ${p.town}.` : `${m.name} at ${p.town} verified.`, {pid:p.id, read:true});
+  confirmPay(d){ const p = pById(d.pid), m = mById(d.mid), a = amt(p, m.id); p.paid[m.id] = today(); ui.modal = null; ui.shot[p.id] = null;
+    { const lv = onsiteVisit(p, m.id); if(lv) proPost(lv.verifierId, `${OWNER.first} approved the stage you checked: ${m.name.toLowerCase()} at ${p.town}. Thank you.`, { vid:lv.id }); } post("updates", "macho", a ? `You approved ${money(a)} for ${m.name.toLowerCase()} at ${p.town}.` : `${m.name} at ${p.town} verified.`, {pid:p.id, read:true});
     commit(a ? `Payment of ${money(a)} approved.` : `${m.name} verified.`); },
   siRole(d){ ui.si.role = d.v; ui.si.step = 2; ui.si.cc = d.v === "client" ? "+1" : "+254"; ui.si.phone = ""; render(); },
   siBack(){ const si = ui.si; si.step = si.step === 4 ? 1 : si.step - 1; si.demoCode = null; render(); },
@@ -2380,20 +2695,40 @@ const actions = {
     const cc = CODES.map(c => c[0]).sort((a, b) => b.length - a.length).find(c => n.startsWith(c)); si.cc = cc; si.phone = n.slice(cc.length).trim(); render(); },
   async siSend(){ const si = ui.si, inp = document.getElementById("si-phone"), err = document.getElementById("si-err");
     if(inp) si.phone = inp.value.trim();
-    const digits = si.phone.replace(/\D/g, "").replace(/^0/, "");
+    const full = fullPhone(si.cc, si.phone), digits = full.replace(/\D/g, "").slice(si.cc.replace(/\D/g, "").length);
     if(digits.length < 7 || digits.length > 12){ if(err) err.textContent = "Please check the number. Leave out the first 0."; return; }
-    if(si.role === "review" && !DEMO && !(CFG.staffPhones || []).map(x => x.replace(/\D/g, "")).includes((si.cc + digits).replace(/\D/g, ""))){ if(err) err.textContent = "This number isn’t on the review desk staff list."; return; }
-    if(REAL_AUTH()){ const { error } = await SYNC.db.auth.signInWithOtp({ phone:si.cc + digits }); if(error){ if(err) err.textContent = "We couldn’t send a code. Please try again in a minute."; return; } si.demoCode = null; }
+    if(!isOwner(full)){
+      const has = roleOfPhone(full);
+      if(has && has !== si.role){ if(err) err.innerHTML = `This number is registered as ${ROLE_NAME[has]}. Each number can only be used for one kind of account. <button class="linkish" data-act="siSwitch" data-v="${has}">Sign in as ${ROLE_NAME[has]} instead</button>`; return; }
+      if(si.role === "review" && has !== "review"){ if(err) err.textContent = "This number isn’t on the review desk staff list. Only Macho staff can use the review desk."; return; }
+      if(si.role === "verifier" && has !== "verifier"){
+        const a = apps().filter(x => samePhone(x.phone, full)).slice(-1)[0];
+        if(a && a.status !== "approved"){ si.step = 6; render(); return; }
+        si.step = 5; render(); return; }
+    }
+    if(REAL_AUTH()){ const { error } = await SYNC.db.auth.signInWithOtp({ phone:full }); if(error){ if(err) err.textContent = "We couldn’t send a code. Please try again in a minute."; return; } si.demoCode = null; }
     else si.demoCode = String(Math.floor(100000 + Math.random() * 900000));
     si.step = 3; render(); setTimeout(() => { const c = document.getElementById("si-code"); if(c) c.focus(); }, 0); },
   async siVerify(){ const si = ui.si, code = (document.getElementById("si-code") || {}).value || "", err = document.getElementById("si-err");
     if(!/^\d{6}$/.test(code.trim())){ if(err) err.textContent = "Enter the 6 digits from the text message."; return; }
-    if(REAL_AUTH()){ const { error } = await SYNC.db.auth.verifyOtp({ phone:si.cc + si.phone.replace(/\D/g, "").replace(/^0/, ""), token:code.trim(), type:"sms" });
+    if(REAL_AUTH()){ const { error } = await SYNC.db.auth.verifyOtp({ phone:fullPhone(si.cc, si.phone), token:code.trim(), type:"sms" });
       if(error){ if(err) err.textContent = "That code didn’t work. Check it, or send a new one."; return; } }
     else if(code.trim() !== si.demoCode){ if(err) err.textContent = "That code didn’t match. Check the demo text message above."; return; }
-    if(si.role === "verifier"){ const full = (si.cc + si.phone).replace(/\D/g, ""), match = Object.keys(VERIFIERS).find(id => VERIFIERS[id].phone.replace(/\D/g, "") === full);
-      if(match) return signInAs("verifier", { sid:match }); si.step = 4; render(); return; }
-    signInAs(si.role); },
+    const full = fullPhone(si.cc, si.phone), owner = isOwner(full);
+    if(si.role === "verifier"){
+      if(owner){ si.step = 4; render(); return; }
+      const match = Object.keys(VERIFIERS).find(id => samePhone(VERIFIERS[id].phone, full));
+      if(match) return signInAs("verifier", { sid:match }); si.step = 5; render(); return; }
+    if(!owner && !roleOfPhone(full)){ accounts()[full.replace(/\D/g, "")] = { role:si.role, since:today() }; save(); }
+    signInAs(si.role, owner ? { owner:true } : {}); },
+  siSwitch(d){ ui.si.role = d.v; ui.si.step = 2; render(); },
+  siRestart(){ ui.si = { step:1, role:null, cc:"+1", phone:"" }; render(); },
+  apSend(){ const g = id => (document.getElementById(id) || {}).value || "", err = document.getElementById("si-err"), si = ui.si;
+    const name = g("ap-name").trim(), reg = g("ap-reg").trim(), idNo = g("ap-id").trim();
+    if(!name || !reg || !idNo){ err.textContent = "Please fill in your name, registration number and ID number."; return; }
+    if(!document.getElementById("ap-coi").checked){ err.textContent = "Please confirm the statement about contractors and sellers."; return; }
+    apps().push({ id:"app-" + (S.nextId++), phone:fullPhone(si.cc, si.phone), name, role:g("ap-role"), reg, idNo, counties:g("ap-counties").trim(), at:now(), status:"pending" });
+    si.step = 6; commit("Application sent to the review desk."); },
   siPro(d){ signInAs("verifier", { sid:d.v }); },
   signOut(){ signOut(); setHash(); },
   toSignIn(){ ui.forceSignIn = true; ui.si = null; ui.modal = null; render(); setHash(); window.scrollTo(0, 0); },
@@ -2438,11 +2773,12 @@ const actions = {
     if(!M.items.length){ err.textContent = "Tick at least one check you disagree with."; return; }
     if(!(M.text || "").trim()){ err.textContent = "Tell us briefly what you think is wrong."; return; }
     const c = { id:"case-" + (S.nextId++), pid:v.projectId, mid:v.milestoneId, vid:v.id, items:M.items.slice(), text:M.text.trim(), want:M.want, opened:today(), step:1 };
-    cases().push(c); post("help", "help", `Case opened for the ${mById(c.mid).name.toLowerCase()} report at ${pById(c.pid).town}. A senior surveyor will check the photos within 2 working days. Payment for this stage is paused.`, {read:false});
+    cases().push(c); proPost(v.verifierId, `The client has questioned your report for ${mById(c.mid).name.toLowerCase()} at ${pById(c.pid).town}. A senior surveyor will look at your photos. You may be asked to explain a check; reply calmly and don’t contact the client about it.`, { vid:v.id });
+    post("help", "help", `Case opened for the ${mById(c.mid).name.toLowerCase()} report at ${pById(c.pid).town}. A senior surveyor will check the photos within 2 working days. Payment for this stage is paused.`, {read:false});
     ui.modal = null; ui.shot[v.projectId] = null; commit("Case opened. We’ll keep you posted in Messages and Help."); },
   caseNext(d){ const c = cases().find(x => x.id === d.cid); c.step = Math.min(3, c.step + 1);
     if(c.step === 2) post("help", "help", c.want === "visit" ? "The senior surveyor has looked at the photos and arranged a free second visit by a different surveyor." : "The senior surveyor has finished reviewing the photos. We’ll explain the decision next.", {read:false});
-    if(c.step === 3){ c.outcome = c.want === "visit" ? "Sample outcome: the second surveyor confirmed the first report. You can now decide on payment." : "Sample outcome: the senior surveyor agreed with the original report and explained each check. You can now decide on payment."; post("help", "help", c.outcome, {read:false}); }
+    if(c.step === 3){ proPost(vById(c.vid) && vById(c.vid).verifierId, `The dispute about your report for ${mById(c.mid).name.toLowerCase()} at ${pById(c.pid).town} is closed: the senior review agreed with your report.`, { vid:c.vid }); c.outcome = c.want === "visit" ? "Sample outcome: the second surveyor confirmed the first report. You can now decide on payment." : "Sample outcome: the senior surveyor agreed with the original report and explained each check. You can now decide on payment."; post("help", "help", c.outcome, {read:false}); }
     ui.shot[c.pid] = null; commit(c.step === 3 ? "Case closed." : "Case moved to the next step."); },
   mic(){ const d = CAP.dictation; if(!d) return; if(listening){ d.stop().catch(() => {}); return; } d.start().catch(e => { if(e && e.code === "not_granted"){ CAP.dictation = null; keepScroll(render); } }); },
   listen(d){ const t = CAP.tts, m = msgs()[+d.i]; if(!t || !m) return;
@@ -2473,33 +2809,58 @@ const actions = {
     setTimeout(() => { post("help", "help", "Thanks, Wanjiru. Amina from the help desk has your message and will reply within 2 hours.", {sample:true}); save(); if(ui.page === "help"){ render(); scrollMsgs(); } }, 1200); },
   people(d){ ui.role = "client"; ui.page = "people"; ui.modal = null; if(d && d.pid) ui.reqPid = d.pid; render(); window.scrollTo(0, 0); },
   viewPerson(d){ ui.modal = {kind:"person", sid:d.sid}; renderModal(); },
-  requestPerson(d){ ui.modal = {kind:"request", sid:d.sid, pid:ui.reqPid}; renderModal(); },
+  requestPerson(d){ ui.modal = {kind:"request", sid:d.sid, pid:d.pid || ui.reqPid}; renderModal(); },
   rqContact(d){ ui.modal.contact = d.v; renderModal(); },
   sendReq(){ const M = ui.modal, x = VERIFIERS[M.sid], p = pById(M.pid), cur = currentMilestone(p);
     const rid = "req-" + (S.nextId++);
     reqs().push({ id:rid, sid:M.sid, pid:p.id, mid:cur.id, type:M.type, date:M.date, time:M.time, contact:M.contact, note:M.note || "", status:"pending", sentAt:today() });
+    proPost(M.sid, `New request from ${OWNER.first}: ${M.type === "onsite" ? cur.name.toLowerCase() + " visit" : "video check-in"} at ${p.town}, ${M.date}, ${M.time}. Accept or decline it in Jobs.`, { tab:"jobs" });
     post(rid, "client", `Hello ${x.name.split(" ")[0]}. Could you do the ${M.type === "onsite" ? cur.name.toLowerCase() + " visit" : "video check-in"} for my ${p.name.toLowerCase()} in ${p.town} on ${M.date}, ${M.time}?${M.note ? " " + M.note : ""}`);
     ui.modal = null; commit(`Request sent to ${x.name}. ${x.reply}.`); window.scrollTo(0, 0); },
-  cancelReq(d){ const r = reqs().find(x => x.id === d.rid); r.status = "cancelled"; post(reqThread(r), "system", "You cancelled this request."); commit("Request cancelled."); },
+  cancelReq(d){ const r = reqs().find(x => x.id === d.rid); r.status = "cancelled"; post(reqThread(r), "system", "The client cancelled this request.");
+    proPost(r.sid, `${OWNER.first} cancelled the request for ${pById(r.pid).town} on ${r.date}. No action needed.`); commit("Request cancelled."); },
   acceptReq(d){ const r = reqs().find(x => x.id === d.rid), p = pById(r.pid);
     const v = { id:"visit-" + (S.nextId++), projectId:p.id, milestoneId:r.mid, type:r.type, verifierId:r.sid, scheduled:`${r.date}, ${r.time}`, requestId:r.id,
       status:"assigned", checklist:{}, reasons:{}, other:{}, photos:{}, issuePhotos:{}, progress:0, summary:"", fee:r.type === "onsite" ? VERIFIERS[r.sid].fee : VERIFIERS[r.sid].video };
     const af = activeFix(p, r.mid); if(af && af.status === "fixed" && r.type === "onsite"){ af.status = "recheck"; v.recheck = true; v.fixOf = af.id; }
-    S.visits.push(v); r.status = "accepted"; r.visitId = v.id; ui.vTab = "visits";
-    post(reqThread(r), "surveyor", `Hello ${OWNER.first}, I’ve accepted. I’ll be at ${p.town} on ${r.date} at ${r.time}. I won’t tell the contractor the day. You’ll get my report after the review desk checks it.`); commit("Accepted. The visit is in My visits, and the client has been told."); },
+    S.visits.push(v); r.status = "accepted"; r.visitId = v.id; ui.vTab = "jobs";
+    post(reqThread(r), "surveyor", `Hello ${OWNER.first}, I’ve accepted. I’ll be at ${p.town} on ${r.date} at ${r.time}. I won’t tell the contractor the day. You’ll get my report after the review desk checks it.`); commit("Accepted. The visit is under To do in Jobs, and the client has been told."); },
   declineStart(d){ ui.declining = d.rid; keepScroll(render); },
   declineCancel(){ ui.declining = null; keepScroll(render); },
   declineWhy(d){ const r = reqs().find(x => x.id === d.rid); r.why = d.t; keepScroll(render); },
   declineReq(d){ const r = reqs().find(x => x.id === d.rid); if(!r.why) return; r.status = "declined"; ui.declining = null; post(reqThread(r), "surveyor", `Sorry ${OWNER.first}, I can’t take this one. Reason: ${r.why.toLowerCase()}.`); commit("Declined. The client will be asked to choose someone else."); },
-  openProProj(d){ ui.vProj = d.pid; render(); window.scrollTo(0, 0); },
+  toggleFav(d){ const l = favs(), i = l.indexOf(d.sid); if(i >= 0) l.splice(i, 1); else l.push(d.sid); save(); keepScroll(render); if(ui.modal) renderModal();
+    toast(i >= 0 ? `${VERIFIERS[d.sid].name} removed from your favourites.` : `${VERIFIERS[d.sid].name} added to your favourites.`); },
+  quickReply(d){ post(d.t, "surveyor", d.v); save(); render(); scrollMsgs(); },
+  jobView(d){ ui.jobView = d.v; keepScroll(render); },
+  pThread(d){ ui.pThread = d.t; render(); scrollMsgs(); },
+  pThreadBack(){ ui.pThread = null; render(); },
+  proSend(d){ const b = document.getElementById("composer"), text = b && b.value.trim(); if(!text) return; post(d.t, "surveyor", text); save(); render(); scrollMsgs(); },
+  pEdit(){ const x = VERIFIERS[ui.signedIn]; ui.pEdit = { bio:x.bio, skills:x.skills.slice(), langs:x.langs.slice(), years:x.years, counties:x.counties.slice(), fee:x.fee, video:x.video, away:!!x.away, next:x.next }; render(); },
+  peCancel(){ ui.pEdit = null; render(); },
+  peCounty(d){ const e = ui.pEdit; ["bio","skills","langs","years","fee","video","next"].forEach(k => { const el = document.getElementById("pe-" + k); if(el) e[k] = k === "skills" || k === "langs" ? el.value.split(",").map(x => x.trim()).filter(Boolean) : el.value; });
+    const a = document.getElementById("pe-away"); if(a) e.away = !a.checked;
+    const i = e.counties.indexOf(d.v); if(i >= 0) e.counties.splice(i, 1); else e.counties.push(d.v); keepScroll(render); },
+  peSave(){ const g = id => document.getElementById(id), err = g("pe-err"), sid = ui.signedIn;
+    const fee = Math.round(+g("pe-fee").value), video = Math.round(+g("pe-video").value), years = Math.max(0, Math.round(+g("pe-years").value || 0));
+    if(!fee || fee < 1000){ err.textContent = "The site visit fee must be at least KSh 1,000."; return; }
+    if(!video || video < 500){ err.textContent = "The video check-in fee must be at least KSh 500."; return; }
+    if(!ui.pEdit.counties.length){ err.textContent = "Pick at least one county."; return; }
+    const ed = (S.proEdits || (S.proEdits = {}));
+    ed[sid] = Object.assign(ed[sid] || {}, { bio:g("pe-bio").value.trim(), skills:g("pe-skills").value.split(",").map(x => x.trim()).filter(Boolean), langs:g("pe-langs").value.split(",").map(x => x.trim()).filter(Boolean),
+      years, counties:ui.pEdit.counties.slice(), fee, video, away:!g("pe-away").checked, next:g("pe-next").value });
+    ui.pEdit = null; mergePros(); commit("Profile saved. Clients see the changes now."); window.scrollTo(0, 0); },
+  payoutChange(){ toast("For your safety, the review desk confirms any change of payout number by calling you first."); },
+  openProProj(d){ ui.vTab = "projects";  ui.vProj = d.pid; render(); window.scrollTo(0, 0); },
   closeProProj(){ ui.vProj = null; render(); },
   statement(){ toast("In the live app this saves a PDF statement of your fees, for KRA and your records."); },
-  vTab(d){ ui.vProj = null; ui.vTab = d.t; ui.declining = null; render(); },
+  vTab(d){ ui.vProj = null; ui.pThread = null; ui.pEdit = null; ui.vTab = d.t; ui.declining = null; render(); },
   openSurveyorApp(d){ ui.role = "verifier"; setTimeout(setHash, 0); ui.signedIn = d.sid; ui.vVisit = null; ui.vTab = "requests"; ui.modal = null; render(); window.scrollTo(0, 0); },
   contact(d){ const x = VERIFIERS[d.sid]; toast(`In the live app this opens ${d.how === "call" ? "a call" : d.how} with ${x.name} through a Macho number, so both numbers stay private.`); },
   fixList(d){ ui.modal = {kind:"fix", pid:d.pid, mid:d.mid}; renderModal(); },
   sendFix(){ const M = ui.modal, p = pById(M.pid), v = onsiteVisit(p, M.mid), x = new Date(); x.setDate(x.getDate() + (+M.due));
     fx(p).push({ id:"fix-" + (S.nextId++), mid:M.mid, vid:v.id, items:M.items.slice(), note:M.note || "", due:x.toLocaleDateString("en-GB", {day:"numeric", month:"short", year:"numeric"}), sentAt:today(), status:"sent" });
+    proPost(v.verifierId, `${OWNER.first} used your report to hold the payment for ${mById(M.mid).name.toLowerCase()} at ${p.town} and send the ${TYPES[ptype(p)].payee} a fix list.`, { vid:v.id });
     post("updates", "macho", `Payment on hold for ${mById(M.mid).name.toLowerCase()} at ${p.town}. Fix list sent to ${p.contractor}.`, {pid:p.id, read:true});
     ui.modal = null; ui.shot[p.id] = null; commit(`Payment on hold. Fix list sent to ${p.contractor}.`); },
   contractorFixed(d){ const p = pById(d.pid), f = activeFix(p, d.mid); f.status = "fixed"; f.fixedAt = today(); post("updates", "macho", `${p.contractor} says the fixes at ${p.town} are done. Book a re-check before you pay.`, {pid:p.id, read:false}); commit(`${p.contractor} says the fixes are done.`); },
@@ -2529,10 +2890,22 @@ const actions = {
   retake(d){ const v = vById(d.vid); delete v.photos[d.spot]; save(); keepScroll(render); },
   submit(d){ const v = vById(d.vid); if(missing(v).length) return; v.status = "submitted"; v.submittedAt = now(); ui.vVisit = null;
     post(v.requestId ? reqThread({id:v.requestId}) : "updates", "system", `${VERIFIERS[v.verifierId].name} finished the visit. The report is with our review desk.`); commit("Sent to the review desk."); window.scrollTo(0, 0); },
+  apApprove(d){ const a = apps().find(x => x.id === d.id); a.status = "approved"; a.decidedAt = now();
+    const id = "vx" + (S.nextId++), fee = { "Advocate":12000, "Licensed land surveyor":15000, "Registered valuer":13000, "Structural engineer":12000, "Civil engineer":9000 }[a.role] || 7500;
+    (S.extraPros || (S.extraPros = {}))[id] = { name:a.name, role:a.role, reg:a.reg, body:"Checked by Macho", years:1, visits:0, rating:0, reviews:0, fee, video:Math.round(fee / 3 / 500) * 500,
+      counties:(a.counties || "Nairobi").split(",").map(x => x.trim()).filter(Boolean), langs:["English","Kiswahili"], next:"This week", reply:"New on Macho", turnaround:"Report in 1 day",
+      skills:[], bio:"New to Macho. Registration and ID checked by the review desk.", said:[], phone:a.phone };
+    accounts()[a.phone.replace(/\D/g, "")] = { role:"verifier", since:today() }; mergePros();
+    commit(`${a.name} approved. They can now sign in and take jobs.`); },
+  apReject(d){ ui.rejecting = ui.rejecting === d.id ? null : d.id; keepScroll(render); },
+  apRejectWhy(d){ const a = apps().find(x => x.id === d.id); a.status = "rejected"; a.note = d.v; a.decidedAt = now(); ui.rejecting = null; commit("Application not approved."); },
+  rtab(d){ ui.rtab = d.v; ui.rVisit = null; render(); },
+  closeReview(){ ui.rVisit = null; render(); window.scrollTo(0, 0); },
   openReview(d){ ui.rVisit = d.vid; render(); },
   rqual(d){ ui.rq = ui.rq || {}; ui.rq[d.k] = ui.rq[d.k] === false; keepScroll(render); },
   payAll(){ const due = S.visits.filter(v => v.status === "approved" && ensureVisitRecord(v).payout.status === "processing");
-    due.forEach(v => { v.payout = { status:"paid", on:today(), ref:payRef(v.id + today()), method:"M-Pesa" }; });
+    due.forEach(v => { v.payout = { status:"paid", on:today(), ref:payRef(v.id + today()), method:"M-Pesa" };
+      proPost(v.verifierId, `Paid ${money(netOf(v))} by M-Pesa for ${mById(v.milestoneId).name.toLowerCase()} at ${pById(v.projectId).town}. Ref. ${v.payout.ref}.`, { tab:"earnings" }); });
     commit(due.length ? `Paid ${due.length} ${due.length > 1 ? "professionals’ fees" : "professional’s fee"} by M-Pesa.` : "Nothing waiting to be paid."); },
   approve(d){ const v = vById(d.vid); v.status = "approved"; v.reviewNote = (v.reviewNoteDraft || "").trim(); v.reviewNoteDraft = ""; v.reviewedAt = now(); v.reviewer = REVIEWER; ui.rVisit = null;
     v.history = (v.history || []).concat([{ at:now(), by:REVIEWER, outcome:"approved", note:v.reviewNote }]);
@@ -2543,18 +2916,24 @@ const actions = {
       if(f){ f.status = "done"; } if(old && band(v).k === "good") old.resolved = `Fixed by the contractor and re-checked by ${VERIFIERS[v.verifierId].name} on ${today()}.`; }
     { const p = pById(v.projectId), m = mById(v.milestoneId), b = band(v);
       post("updates", "macho", `Report ready: ${m.name} at your ${p.name.toLowerCase()} in ${p.town}. Scored ${scoreOf(v)} out of 100. ${b.t}.`, {vid:v.id, read:false}); }
+    proPost(v.verifierId, `Your report for ${mById(v.milestoneId).name.toLowerCase()} at ${pById(v.projectId).town} was approved, scoring ${scoreOf(v)} out of 100.${v.reviewNote ? " Note from the review desk: " + v.reviewNote : ""} ${money(netOf(v))} will be paid on ${v.payout.due}.`, { vid:v.id });
     commit("Approved. The client can now read the report."); },
   sendBack(d){ const v = vById(d.vid), note = (v.reviewNoteDraft || "").trim();
     if(!note){ toast("Add a note telling the surveyor what to fix."); return; }
     v.status = "returned"; v.reviewNote = note; v.reviewNoteDraft = ""; v.reviewedAt = now(); ui.rVisit = null; ui.rq = null;
-    v.history = (v.history || []).concat([{ at:now(), by:REVIEWER, outcome:"returned", note }]); commit("Sent back to the professional."); },
+    v.history = (v.history || []).concat([{ at:now(), by:REVIEWER, outcome:"returned", note }]);
+    proPost(v.verifierId, `Your report for ${mById(v.milestoneId).name.toLowerCase()} at ${pById(v.projectId).town} was sent back: ${note} Fix it and resend to get paid.`, { tab:"jobs" });
+    commit("Sent back to the professional."); },
   reset(){
     if(SYNC.on && !ui.resetArmed){ ui.resetArmed = true; toast("This resets the demo for everyone using this link. Tap Reset demo data again to confirm."); setTimeout(() => { ui.resetArmed = false; }, 6000); return; }
     S = seed(); ui = { thread:null, mf:"all", role:"client", page:"home", pid:null, shot:{}, modal:null, signedIn:"v1", vVisit:null, rVisit:null, f:{role:"all", exp:0, county:"any", sort:"exp"} }; commit("Demo data reset."); window.scrollTo(0, 0); }
 };
 document.addEventListener("click", e => { const el = e.target.closest("[data-act]"); if(!el) return; const fn = actions[el.dataset.act]; if(fn) fn(el.dataset, el, e); });
 document.addEventListener("input", e => {
-  const t = e.target, f = t.dataset.field; if(!f) return; const v = t.dataset.vid ? vById(t.dataset.vid) : null;
+  const t = e.target, f = t.dataset.field; if(!f) return;
+  if(f === "siPhone"){ const c = ui.si.cc.replace(/\D/g, ""); let v = t.value.replace(/[^\d ]/g, "");
+    if(v.replace(/\D/g, "").startsWith(c) && v.replace(/\D/g, "").length > c.length + 6) v = v.replace(/\D/g, "").slice(c.length);
+    if(v !== t.value) t.value = v; ui.si.phone = v; return; } const v = t.dataset.vid ? vById(t.dataset.vid) : null;
   if(f === "other"){ v.other[t.dataset.item] = t.value; save(); refreshMissing(v); }
   else if(f === "progress"){ v.progress = +t.value; const o = document.getElementById("progOut"); if(o) o.textContent = t.value + "%"; save(); }
   else if(f === "summary"){ v.summary = t.value; save(); }
@@ -2571,6 +2950,8 @@ document.addEventListener("change", async e => {
   if(f === "photo"){ const file = t.files && t.files[0]; if(!file) return;
     try{ const src = await readPhoto(file), v = vById(t.dataset.vid); v.photos[t.dataset.spot] = {kind:"img", src, stamp:`${now()}\n${SITE[v.projectId] || ""}`}; save(); keepScroll(render); }
     catch(err){ toast("That photo couldn’t be read. Try a different one."); } }
+  else if(f === "proPhoto"){ const file = t.files && t.files[0]; if(!file) return; const th = t.dataset.t;
+    readPhoto(file).then(src => { const b = document.getElementById("composer"); post(th, "surveyor", b ? b.value.trim() : "", { img:{ kind:"img", src } }); save(); render(); scrollMsgs(); }).catch(() => toast("That photo couldn’t be read.")); }
   else if(f === "issuePhoto"){ const file = t.files && t.files[0]; if(!file) return;
     try{ const src = await readPhoto(file), v = vById(t.dataset.vid); ip(v)[t.dataset.item] = {kind:"img", src, stamp:`${now()}\n${SITE[v.projectId] || ""}`}; save(); keepScroll(render); }
     catch(err){ toast("That photo couldn’t be read. Try a different one."); } }
@@ -2578,8 +2959,15 @@ document.addEventListener("change", async e => {
   else if(f === "bookType"){ ui.modal.type = t.value; renderModal(); }
   else if(f === "fixItem"){ const l = ui.modal.items, i = l.indexOf(t.value); if(t.checked && i < 0) l.push(t.value); if(!t.checked && i >= 0) l.splice(i, 1); renderModal(); }
   else if(f === "fixDue"){ ui.modal.due = +t.value; renderModal(); }
+  else if(f === "fFavs"){ ui.f.favs = t.value === "1"; render(); }
+  else if(f === "proAlert"){ const sid = ui.signedIn, ed = (S.proEdits || (S.proEdits = {})), e = ed[sid] || (ed[sid] = {}); e.notify = Object.assign({ wa:proAlert(sid, "wa"), sms:proAlert(sid, "sms") }, e.notify || {}); e.notify[t.dataset.k] = t.checked; save(); toast(t.checked ? "Alerts on." : "Alerts off."); }
+  else if(f === "phoneAlerts"){
+    const store = v => { LOCALSET.phoneAlerts = v; try{ localStorage.setItem("macho-settings", JSON.stringify(LOCALSET)); }catch(e){} };
+    if(!t.checked){ store(false); return; }
+    if(typeof Notification === "undefined"){ t.checked = false; toast("This browser can’t show alerts."); return; }
+    Notification.requestPermission().then(p => { store(p === "granted"); t.checked = p === "granted"; toast(p === "granted" ? "Alerts on for this phone." : "Alerts weren’t allowed. You can allow them in your browser settings."); }).catch(() => { t.checked = false; toast("Alerts aren’t available here."); }); }
   else if(f === "setBar"){ LOCALSET.hideBar = !t.checked; try{ localStorage.setItem("macho-settings", JSON.stringify(LOCALSET)); }catch(e){} render(); }
-  else if(f === "siCc"){ ui.si.cc = t.value; }
+  else if(f === "siCc"){ const p = document.getElementById("si-phone"); if(p) ui.si.phone = p.value; ui.si.cc = t.value; render(); }
   else if(f.startsWith("set_")){ SET()[f.slice(4)] = t.checked; save(); renderChrome(); }
   else if(f === "npType"){ const keep = {}; ["np-name","np-town","np-county","np-contractor","np-budget"].forEach(id => { const e = document.getElementById(id); if(e) keep[id] = e.value; });
     ui.modal.type = t.value; renderModal(); Object.entries(keep).forEach(([id, v]) => { const e = document.getElementById(id); if(e) e.value = v; }); }
