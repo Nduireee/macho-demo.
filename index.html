@@ -698,6 +698,15 @@ body{overflow-x:hidden}
 .mchart{grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
 .mcol .tiny{font-size:.72rem;white-space:nowrap}
 @media (max-width:420px){.mcol .tiny{display:none}}
+.sumcard.drill{cursor:pointer;position:relative}
+.sumcard.drill:hover,.sumcard.drill:focus-visible{border-color:var(--sign)}
+.drillhint{display:inline-flex;align-items:center;gap:4px;font-size:.85rem;font-weight:700;color:var(--ink);margin-top:4px;text-decoration:underline;text-underline-offset:3px}
+.calc li{padding:10px 0}
+.calc li.sub{border-top:2px solid var(--line)}
+.calc li.tot{border-top:3px double var(--line);font-size:1.1rem}
+.brk{max-height:52vh;overflow:auto;margin-top:12px}
+.brk tfoot td{border-top:2px solid var(--line);position:sticky;bottom:0;background:var(--surface)}
+.brk thead th{position:sticky;top:0;background:var(--surface)}
 
 .linkbox{min-width:min(520px,62vw)}
 .sync{font-weight:700;padding:2px 10px;border-radius:12px;background:rgba(255,255,255,.12)}
@@ -1796,16 +1805,22 @@ function ledger(){
   push(today(), "Text and WhatsApp messages (estimate)", notices * OC().smsKsh, { bucket:"cost", note:`${notices} messages` });
   return L.sort((a, b) => b.ts - a.ts);
 }
-function viewOwner(){
-  const per = ui.oPeriod || "all", nowD = new Date(NOWMS());
+const PERIOD_NAME = { all:"all time", year:"this year", month:"this month" };
+function ownerCalc(per){
+  const nowD = new Date(NOWMS());
   const inPer = e => per === "all" ? true : (() => { const d = new Date(e.ts); return per === "month" ? d.getMonth() === nowD.getMonth() && d.getFullYear() === nowD.getFullYear() : d.getFullYear() === nowD.getFullYear(); })();
   const all = ledger(), L = all.filter(inPer), sum = b => L.filter(e => e.bucket === b).reduce((t, e) => t + e.amount, 0);
-  const commission = sum("rev-commission"), escrowFees = sum("rev-escrow"), first = Math.min(...all.filter(e => e.ts).map(e => e.ts)), monthsLive = Math.max(1, Math.round((NOWMS() - first) / (30.4 * 86400000)) + 1),
-    hosting = per === "month" ? OC().hostingKsh : per === "year" ? OC().hostingKsh * (nowD.getMonth() + 1) : OC().hostingKsh * monthsLive;
-  const costs = sum("cost") + hosting, revenue = commission + escrowFees, net = revenue - costs;
+  const first = Math.min(...all.filter(e => e.ts).map(e => e.ts)), monthsLive = Math.max(1, Math.round((NOWMS() - first) / (30.4 * 86400000)) + 1);
+  const hostMonths = per === "month" ? 1 : per === "year" ? nowD.getMonth() + 1 : monthsLive, hosting = OC().hostingKsh * hostMonths;
+  const commission = sum("rev-commission"), escrowFees = sum("rev-escrow"), costs = sum("cost") + hosting, revenue = commission + escrowFees, net = revenue - costs;
   const held = S.projects.reduce((t, p) => t + moneySummary(p).held, 0), owed = all.filter(e => e.bucket === "owed").reduce((t, e) => t + e.amount, 0);
+  return { per, nowD, all, L, sum, commission, escrowFees, hosting, hostMonths, costs, revenue, net, held, owed };
+}
+function viewOwner(){
+  const per = ui.oPeriod || "all", C = ownerCalc(per);
+  const { nowD, all, L, commission, escrowFees, costs, net, held, owed } = C;
   const usd = k => `$${Math.round(k / 130).toLocaleString("en-US")}`;
-  const kpi = (v, t, sub, tone) => `<div class="sumcard ${tone || ""}"><strong>${money(v)}</strong><span>${t}</span><span class="tiny muted">${sub || usd(v)}</span></div>`;
+  const kpi = (v, t, sub, tone, key) => `<button class="sumcard drill ${tone || ""}" data-act="obreak" data-k="${key}" aria-label="${t}: ${money(v)}. Show the breakdown"><strong>${money(v)}</strong><span>${t}</span><span class="tiny muted">${sub || usd(v)}</span><span class="drillhint">${ic("list",14)} See breakdown</span></button>`;
   // checks that the numbers add up
   const funded = all.filter(e => e.bucket === "escrow-in").reduce((t, e) => t + e.amount, 0), out = all.filter(e => e.bucket === "escrow-out").reduce((t, e) => t + e.amount, 0);
   const feesIn = all.filter(e => e.bucket === "fee-in").reduce((t, e) => t + e.amount, 0), comm = all.filter(e => e.bucket === "rev-commission").reduce((t, e) => t + e.amount, 0), paidOut = all.filter(e => e.bucket === "payout").reduce((t, e) => t + e.amount, 0);
@@ -1829,8 +1844,8 @@ function viewOwner(){
   return `<h1 class="hello">Owner’s dashboard</h1>
     <p class="hello-sub">Only you can see this. Money in, money out, what Macho earns, what it costs, and whether everything adds up.</p>
     <div class="chips pick" style="margin-top:14px">${tabs.map(([k, t]) => `<button data-act="oPeriod" data-v="${k}" aria-pressed="${per === k}">${t}</button>`).join("")}</div>
-    <div class="sumcards">${kpi(net, "Macho net income", `${usd(net)} after estimated costs`, net >= 0 ? "" : "hot")}${kpi(commission, "Commission on visit fees", `30% of each fee, ${usd(commission)}`)}${kpi(escrowFees, "Escrow handling fees", `${ESCROW_FEE * 100}% of money released, ${usd(escrowFees)}`)}${kpi(costs, "Costs (estimated)", usd(costs))}</div>
-    <div class="sumcards">${kpi(held, "Client money in escrow now", "Held by the partner bank, never Macho’s")}${kpi(paidOut, "Paid to professionals (all time)", usd(paidOut))}${kpi(owed, "Owed to professionals", `Paid on ${nextPayDay()}`)}${kpi(out, "Released to contractors and sellers", usd(out))}</div>
+    <div class="sumcards">${kpi(net, "Macho net income", `${usd(net)} after estimated costs`, net >= 0 ? "" : "hot", "net")}${kpi(commission, "Commission on visit fees", `30% of each fee, ${usd(commission)}`, "", "comm")}${kpi(escrowFees, "Escrow handling fees", `${ESCROW_FEE * 100}% of money released, ${usd(escrowFees)}`, "", "escrow")}${kpi(costs, "Costs (estimated)", usd(costs), "", "costs")}</div>
+    <div class="sumcards">${kpi(held, "Client money in escrow now", "Held by the partner bank, never Macho’s", "", "held")}${kpi(paidOut, "Paid to professionals (all time)", usd(paidOut), "", "paid")}${kpi(owed, "Owed to professionals", `Paid on ${nextPayDay()}`, "", "owed")}${kpi(out, "Released to contractors and sellers", usd(out), "", "released")}</div>
     <section class="card" style="margin-top:20px"><h2>${ic("shield",24)} Does everything add up?</h2>
       <ul class="checks">${checks.map(([ok, t]) => `<li><span class="tick ${ok ? "" : "no"}">${ic(ok ? "check" : "cross",14)}</span><span>${t}${ok ? "" : " <strong>Look into this.</strong>"}</span></li>`).join("")}</ul></section>
     <div class="ograd">
@@ -2834,6 +2849,70 @@ function renderModal(){
       <p class="small">Prefer to pick someone yourself? <button class="linkish" data-act="people" data-pid="${p.id}">Choose a surveyor</button></p>
       <div class="btn-row"><button class="btn sign" data-act="confirmBook">Book for ${money(PRICES[M.type])}</button><button class="btn ghost" data-act="close">Cancel</button></div>`;
   }
+  if(M.kind === "obreak"){
+    const C = ownerCalc(ui.oPeriod || "all"), pn = PERIOD_NAME[C.per], usd = k => `$${Math.round(k / 130).toLocaleString("en-US")}`;
+    const tbl = (rows, cols, total) => `<div class="tablewrap brk"><table class="ptable"><thead><tr>${cols.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>${rows.join("") || `<tr><td colspan="${cols.length}" class="muted">Nothing in this period.</td></tr>`}</tbody>
+      ${total != null ? `<tfoot><tr><td colspan="${cols.length - 1}"><strong>Total</strong></td><td><strong>${money(total)}</strong></td></tr></tfoot>` : ""}</table></div>`;
+    const where = e => e.p ? `${esc(e.p.name)}, ${esc(e.p.town)}${e.m ? `<div class="tiny muted">${e.m.name}</div>` : ""}` : "–";
+    const sumOf = es => es.reduce((t, e) => t + e.amount, 0);
+    const line = (label, v, sign, act) => `<li><span>${act ? `<button class="linkish" data-act="obreak" data-k="${act}">${label}</button>` : label}</span><strong>${sign || ""}${money(v)}</strong></li>`;
+    let title = "", intro = "", body = "";
+    const costGroups = () => { const g = {}; C.L.filter(e => e.bucket === "cost").forEach(e => { const k = e.kind; g[k] = g[k] || { n:0, t:0, note:e.note }; g[k].n++; g[k].t += e.amount; if(e.note) g[k].note = e.note; });
+      g["Hosting and tools"] = { n:C.hostMonths, t:C.hosting, note:`${C.hostMonths} ${C.hostMonths === 1 ? "month" : "months"} × ${money(OC().hostingKsh)}` }; return g; };
+    const k = M.k;
+    if(k === "net"){
+      const g = costGroups();
+      title = `Macho net income, ${pn}: ${money(C.net)}`;
+      intro = "What Macho earned, minus what it cost to run. Tap any line to see the items behind it.";
+      body = `<ul class="rows calc">${line("Commission on visit fees (30%)", C.commission, "+", "comm")}${line(`Escrow handling fees (${ESCROW_FEE * 100}% of money released)`, C.escrowFees, "+", "escrow")}
+        <li class="sub"><span><strong>Income</strong></span><strong>${money(C.revenue)}</strong></li>
+        ${Object.entries(g).map(([kk, x]) => line(`${kk}${x.note ? ` <span class="tiny muted">(${x.note})</span>` : ` <span class="tiny muted">(${x.n})</span>`}`, x.t, "−", "costs")).join("")}
+        <li class="sub"><span><strong>Costs</strong></span><strong>−${money(C.costs)}</strong></li>
+        <li class="tot"><span><strong>Net income</strong></span><strong>${money(C.net)}</strong></li></ul>
+        <p class="small muted" style="margin-top:8px">${money(C.revenue)} − ${money(C.costs)} = ${money(C.net)} (${usd(C.net)}).</p>`;
+    }
+    if(k === "comm"){
+      const es = C.L.filter(e => e.bucket === "rev-commission");
+      title = `Commission on visit fees, ${pn}: ${money(C.commission)}`;
+      intro = `For every approved report, the client’s fee is split: ${Math.round(PRO_SHARE * 100)}% to the professional and ${100 - Math.round(PRO_SHARE * 100)}% to Macho. These are the ${es.length} reports behind the total.`;
+      body = tbl(es.map(e => `<tr><td class="small">${esc(e.date)}</td><td class="small">${where(e)}</td><td class="small">${VERIFIERS[e.v.verifierId].name}</td><td>${money(feeOf(e.v))}</td><td><strong>${money(e.amount)}</strong></td></tr>`), ["Date","Project","Professional","Client paid","Macho’s 30%"], sumOf(es));
+    }
+    if(k === "escrow"){
+      const es = C.L.filter(e => e.bucket === "rev-escrow");
+      title = `Escrow handling fees, ${pn}: ${money(C.escrowFees)}`;
+      intro = `Macho charges ${ESCROW_FEE * 100}% of each stage payment when the bank releases it to the contractor or seller. ${es.length} ${es.length === 1 ? "release" : "releases"} in this period.`;
+      body = tbl(es.map(e => `<tr><td class="small">${esc(e.date)}</td><td class="small">${where(e)}</td><td>${money(amt(e.p, e.m.id))}</td><td><strong>${money(e.amount)}</strong></td></tr>`), ["Date","Project and stage","Amount released","Fee"], sumOf(es));
+    }
+    if(k === "costs"){
+      const g = costGroups(), es = C.L.filter(e => e.bucket === "cost");
+      title = `Costs, ${pn}: ${money(C.costs)}`;
+      intro = "Estimated from the cost assumptions at the bottom of the dashboard. In the live app these come from your providers’ invoices.";
+      body = `<ul class="rows calc">${Object.entries(g).map(([kk, x]) => `<li><span>${kk}<div class="tiny muted">${x.note || `${x.n} ${x.n === 1 ? "item" : "items"}`}</div></span><strong>${money(x.t)}</strong></li>`).join("")}
+        <li class="tot"><span><strong>Total costs</strong></span><strong>${money(C.costs)}</strong></li></ul>
+        <h3 class="modal-sub" style="font-size:1.1rem">Every cost item</h3>
+        ${tbl(es.map(e => `<tr><td class="small">${esc(e.date)}</td><td class="small">${e.kind}</td><td class="small">${where(e)}</td><td><strong>${money(e.amount)}</strong></td></tr>`).concat([`<tr><td class="small">Monthly</td><td class="small">Hosting and tools</td><td class="small">${C.hostMonths} × ${money(OC().hostingKsh)}</td><td><strong>${money(C.hosting)}</strong></td></tr>`]), ["Date","What","Project","Amount"], C.costs)}`;
+    }
+    if(k === "held"){
+      const rows = []; S.projects.forEach(p => { const mo = money0(p); Object.entries(mo.funded).forEach(([mid, f]) => { const r = mo.releases[mid]; if(r && r.status === "paid") return;
+        rows.push(`<tr><td class="small">${esc(f.on)}</td><td class="small">${esc(p.name)}, ${esc(p.town)}<div class="tiny muted">${mById(mid).name}</div></td><td class="small">${r ? (r.status === "sent" ? "With the bank" : "Release requested") : "Held"}</td><td><strong>${money(amt(p, mid))}</strong></td></tr>`); }); });
+      title = `Client money in escrow now: ${money(C.held)}`;
+      intro = "Every stage payment clients have sent that hasn’t been released yet. This is the clients’ money, held by the partner bank, not Macho’s income.";
+      body = tbl(rows, ["Received","Project and stage","Status","Amount"], C.held);
+    }
+    if(k === "paid" || k === "owed"){
+      const es = C.all.filter(e => e.bucket === (k === "paid" ? "payout" : "owed"));
+      title = k === "paid" ? `Paid to professionals: ${money(sumOf(es))}` : `Owed to professionals: ${money(sumOf(es))}`;
+      intro = k === "paid" ? "Each professional’s 70% share, paid by M-Pesa after their report was approved." : `Approved reports whose 70% share goes out on ${nextPayDay()}.`;
+      body = tbl(es.map(e => `<tr><td class="small">${esc(e.date)}</td><td class="small">${VERIFIERS[e.v.verifierId].name}</td><td class="small">${where(e)}</td><td class="tiny">${esc(e.ref || "")}</td><td><strong>${money(e.amount)}</strong></td></tr>`), ["Date","Professional","Project","Reference","Amount"], sumOf(es));
+    }
+    if(k === "released"){
+      const es = C.all.filter(e => e.bucket === "escrow-out");
+      title = `Released to contractors and sellers: ${money(sumOf(es))}`;
+      intro = "Stage payments the bank paid out of escrow, each after the report was approved, the client agreed and two Macho staff checked it.";
+      body = tbl(es.map(e => `<tr><td class="small">${esc(e.date)}</td><td class="small">${where(e)}</td><td class="small">${esc(e.p.contractor)}</td><td class="tiny">${esc(e.ref || "")}</td><td><strong>${money(e.amount)}</strong></td></tr>`), ["Date","Project and stage","Paid to","Bank reference","Amount"], sumOf(es));
+    }
+    html = `${M.back ? `<button class="back" data-act="obreak" data-k="${M.back}">${ic("back",18)} Back</button>` : ""}<h2>${title}</h2><p class="muted" style="margin-top:6px">${intro}</p>${body}`;
+  }
   if(M.kind === "fund"){
     narrow = true; const p = pById(M.pid), m = mById(M.mid), a = amt(p, m.id), fx = 130, via = M.via || "bank";
     html = `<h2>Send ${money(a)} to escrow</h2><p class="muted" style="margin-top:4px">${esc(p.name)}: ${m.name}. ${M.need ? "This stage needs its money in escrow before it can be released." : "Held until the stage passes and you approve."}</p>
@@ -3225,6 +3304,7 @@ const actions = {
   freshLocal(){ S = seed(); save(); ui.page = "home"; toast("Fresh sample data loaded on this device."); render(); },
   newProject(d){ ui.modal = {kind:"newProject", type:(d && d.type) || "build"}; renderModal(); },
   hf(d){ ui.hf = d.v; render(); },
+  obreak(d){ const prev = ui.modal && ui.modal.kind === "obreak" ? ui.modal.k : null; ui.modal = { kind:"obreak", k:d.k, back:prev && prev !== d.k ? prev : null }; renderModal(); },
   oPeriod(d){ ui.oPeriod = d.v; ui.oAll = false; render(); },
   oAll(){ ui.oAll = true; keepScroll(render); },
   ledgerCsv(){ const rows = [["Date","What","Project","Stage","Amount (KSh)","Reference"]].concat(ledger().map(e => [e.date, e.kind, e.p ? `${e.p.name}, ${e.p.town}` : "", e.m ? e.m.name : "", (e.bucket === "cost" ? -1 : 1) * e.amount, e.ref || ""]));
