@@ -683,6 +683,21 @@ body{overflow-x:hidden}
 @media (max-width:420px){ .estats{grid-template-columns:1fr} .pstats{grid-template-columns:1fr 1fr} }
 .card.pcard{padding:0}
 .offernote{color:var(--ink);font-weight:700;background:var(--soft);padding:6px 10px;border-radius:6px}
+.ograd{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));gap:20px;margin-top:20px}
+.mchart{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;align-items:end;height:220px;margin-top:10px}
+.mcol{display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.mbars{display:flex;gap:3px;align-items:flex-end;height:150px;width:100%;justify-content:center}
+.mbar{display:block;width:40%;min-height:2px;border-radius:3px 3px 0 0}
+.mbar.rev,.key.rev{background:var(--ok)}
+.mbar.cost,.key.cost{background:var(--bad)}
+.mlab{font-weight:700;font-size:.95rem}
+.legendrow{display:flex;align-items:center;gap:8px;margin-top:8px}
+.key{display:inline-block;width:14px;height:14px;border-radius:3px}
+.ptable tr.cost td strong{color:var(--bad)}
+.ptable tr.rev-commission td strong,.ptable tr.rev-escrow td strong{color:var(--ok)}
+.mchart{grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+.mcol .tiny{font-size:.72rem;white-space:nowrap}
+@media (max-width:420px){.mcol .tiny{display:none}}
 
 .linkbox{min-width:min(520px,62vw)}
 .sync{font-weight:700;padding:2px 10px;border-radius:12px;background:rgba(255,255,255,.12)}
@@ -759,6 +774,9 @@ const ICONS = {
   list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
   briefcase:'<rect x="3" y="7" width="18" height="13" rx="1"/><path d="M8 7V4h8v3M3 12h18"/>',
   pencil:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13 7 4 4"/>',
+  chart:'<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>',
+  scale:'<path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/>',
+  download:'<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>',
   wallet:'<rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20M16 15h2"/><path d="M5 6V4h12v2"/>',
   folder:'<path d="M3 6h6l2 2h10v11H3z"/>',
   star:'<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/>',
@@ -1600,21 +1618,23 @@ function renderChrome(){
       <button class="btn ${ui.page === "help" ? "" : "ghost"} small-btn nav-badge" data-act="help" aria-label="Help desk${unread("help") ? `, ${unread("help")} unread` : ""}">${unread("help") ? `<span class="badge">${unread("help")}</span>` : ""}${ic("help",20)} <span class="tr-label">${L("Help")}</span></button></nav>
       <button class="btn ghost small-btn lang-btn" data-act="langPick" aria-label="Language: ${langOf(SET().lang).native}. Change language" title="Language: ${langOf(SET().lang).native}" data-notr>${ic("globe",20)} <span class="lang-code">${SET().lang.toUpperCase()}</span><span class="lang-name">${langOf(SET().lang).native}</span></button>
       <button class="who-chip who-btn" data-act="account" aria-label="${L("Your account")}"><span class="avatar" data-notr>${OWNER.initials}</span><span class="who-name" data-notr>${OWNER.first}</span></button>`
+    : ui.role === "owner" ? `${signOutBtn}<span class="who-chip"><span class="avatar">${ic("chart",20)}</span><span class="who-name">Owner’s dashboard</span></span>`
     : ui.role === "verifier" ? `${signOutBtn}<span class="who-chip"><span class="avatar">${ic("hardhat",20)}</span><span class="who-name">Professionals’ app</span></span>`
     : `${signOutBtn}<span class="who-chip"><span class="avatar">${ic("shield",20)}</span><span class="who-name">Review desk</span></span>`;
   document.getElementById("topInner").innerHTML = `<button class="brand" data-act="home" aria-label="Macho home"><span class="brand-mark">${ic("hardhat",28)}</span>
     <span><span class="brand-name" data-notr>Macho</span><span class="brand-tag">Independent site checks for your build in Kenya</span></span></button><div class="top-right">${label}</div>`;
   const cv = S.visits.filter(v => ["assigned","inprogress","returned"].includes(v.status)).length + reqs().filter(r => r.status === "pending").length, cr = S.visits.filter(v => v.status === "submitted").length;
   const r = (role, t) => `<button data-act="role" data-role="${role}" aria-current="${ui.role === role && !needSignIn()}">${t}</button>`;
-  document.getElementById("protoBar").innerHTML = `${syncLabel()}${S.clockShift ? `<span class="sync">${ic("clock",14)} Demo clock +${S.clockShift}h</span>` : ""}<span>Demo${ROOM !== "demo" ? ` room “${esc(ROOM)}”` : ""}. You’re viewing ${needSignIn() ? "the sign-in screen" : ui.role === "presenter" ? "the demo controls" : ui.role === "client" ? "the client’s website" : ui.role === "verifier" ? "the professionals’ phone app" : "the internal review desk"}.</span>
-    <span>Switch to:</span>${r("presenter","Demo controls")}${r("client","Client")}${r("verifier", `Professionals’ app${cv ? ` (${cv})` : ""}`)}${r("review", `Review desk${cr ? ` (${cr})` : ""}`)}`;
+  document.getElementById("protoBar").innerHTML = `${syncLabel()}${S.clockShift ? `<span class="sync">${ic("clock",14)} Demo clock +${S.clockShift}h</span>` : ""}<span>Demo${ROOM !== "demo" ? ` room “${esc(ROOM)}”` : ""}. You’re viewing ${needSignIn() ? "the sign-in screen" : ui.role === "presenter" ? "the demo controls" : ui.role === "client" ? "the client’s website" : ui.role === "verifier" ? "the professionals’ phone app" : ui.role === "owner" ? "the owner’s dashboard (only you)" : "the internal review desk"}.</span>
+    <span>Switch to:</span>${r("presenter","Demo controls")}${r("client","Client")}${r("verifier", `Professionals’ app${cv ? ` (${cv})` : ""}`)}${r("review", `Review desk${cr ? ` (${cr})` : ""}`)}${r("owner","Owner")}`;
 }
 
 /* ---------- Sign in with phone number and a one-time code ---------- */
 const CODES = [["+1","USA or Canada"],["+44","United Kingdom"],["+971","UAE"],["+974","Qatar"],["+966","Saudi Arabia"],["+49","Germany"],["+46","Sweden"],["+61","Australia"],["+254","Kenya"]];
 const ROLE_PICK = { client:{ t:"I’m building or buying from abroad", d:"See your projects, reports and payments", icon:"home" },
   verifier:{ t:"I’m a professional", d:"Surveyors, engineers, advocates, valuers and buyer’s agents", icon:"hardhat" },
-  review:{ t:"I work on the Macho review desk", d:"Staff only", icon:"shield" } };
+  review:{ t:"I work on the Macho review desk", d:"Staff only", icon:"shield" },
+  owner:{ t:"I own Macho", d:"Owner only: money, commission and costs", icon:"chart" } };
 const REAL_AUTH = () => !!(CFG.realSignIn && SYNC.db);
 /* Accepts 0702 384 722, 702384722, 254702384722 or +254 702 384 722: all become +254702384722 */
 function fullPhone(cc, typed){
@@ -1718,6 +1738,7 @@ function signInAs(role, extra){
   SESSION = Object.assign({ role, phone:(ui.si ? fullPhone(ui.si.cc, ui.si.phone) : ""), at:now() }, extra || {}); saveSession();
   ui.forceSignIn = false; ui.si = null; ui.modal = null;
   ui.role = role; if(role === "verifier"){ ui.signedIn = SESSION.sid; ui.vTab = null; ui.vVisit = null; }
+  if(role === "owner" && !SESSION.owner){ SESSION = null; saveSession(); ui.role = "client"; toast("Only the owner can open that."); render(); return; }
   if(role === "client"){ ui.page = "home"; }
   setHash(); render(); window.scrollTo(0, 0);
   toast(role === "client" ? `Welcome back, ${OWNER.first}.` : role === "verifier" ? `Signed in as ${VERIFIERS[SESSION.sid].name}.` : "Signed in to the review desk.");
@@ -1750,6 +1771,93 @@ function viewPresenter(){
     <section class="card" style="margin-top:16px"><h2>${ic("stages",28)} While presenting</h2>
       <label class="opt"><input type="checkbox" data-field="setBar" ${LOCALSET.hideBar ? "" : "checked"}><span><strong>Show the blue prototype bar</strong><span class="small muted" style="display:block">Lets you jump between the client, professional and review desk sides. Turn it off to show the app as a real customer would see it.</span></span></label>
       <div class="btn-row"><button class="btn ghost" data-act="role" data-role="client">${ic("home",20)} Go to the client side</button><button class="btn ghost" data-act="toSignIn">${ic("lock",20)} Show the sign-in screen</button>${SESSION ? `<button class="btn ghost" data-act="signOut">Sign out</button>` : ""}</div></section>`;
+}
+
+/* ---------- Owner’s dashboard: money, commission, costs and checks ---------- */
+const ESCROW_FEE = 0.015, BANK_FEE = 0.0025;
+const OC = () => S.ownerCosts || (S.ownerCosts = { cardPct:3.8, payoutKsh:40, smsKsh:1, kycKsh:150, hostingKsh:3250 });
+function ledger(){
+  const L = [], push = (date, kind, amount, extra) => L.push(Object.assign({ date, ts:tsOf(date) || 0, kind, amount }, extra || {}));
+  S.projects.forEach(p => { const mo = money0(p);
+    Object.entries(mo.funded).forEach(([mid, f]) => push(f.on, "Client money into escrow", amt(p, mid), { p, m:mById(mid), ref:f.ref, bucket:"escrow-in" }));
+    Object.entries(mo.releases).forEach(([mid, r]) => { if(r.status !== "paid") return; const a = amt(p, mid);
+      push(r.paidAt, "Released to contractor or seller", a, { p, m:mById(mid), ref:r.bankRef, bucket:"escrow-out" });
+      push(r.paidAt, "Escrow fee earned", Math.round(a * ESCROW_FEE), { p, m:mById(mid), bucket:"rev-escrow" });
+      push(r.paidAt, "Bank escrow charge", Math.round(a * BANK_FEE), { p, m:mById(mid), bucket:"cost" }); }); });
+  S.visits.forEach(v => { const p = pById(v.projectId), m = mById(v.milestoneId); if(!p || !m || v.status !== "approved") return; ensureVisitRecord(v);
+    const fee = feeOf(v), net = netOf(v), d = String(v.reviewedAt).split(",")[0];
+    push(d, "Visit fee paid by client", fee, { p, m, v, bucket:"fee-in" });
+    push(d, "Macho commission", fee - net, { p, m, v, bucket:"rev-commission" });
+    push(d, "Card and M-Pesa charges on the fee", Math.round(fee * OC().cardPct / 100), { p, m, v, bucket:"cost" });
+    if(v.payout.status === "paid"){ push(v.payout.on, "Paid to professional", net, { p, m, v, ref:v.payout.ref, bucket:"payout" }); push(v.payout.on, "M-Pesa payout charge", OC().payoutKsh, { p, m, v, bucket:"cost" }); }
+    else push(d, "Owed to professional", net, { p, m, v, bucket:"owed" }); });
+  apps().forEach(a => push(String(a.at).split(",")[0], "ID check for a new professional", OC().kycKsh, { bucket:"cost" }));
+  const notices = msgs().filter(m => m.from === "macho" || m.chase).length;
+  push(today(), "Text and WhatsApp messages (estimate)", notices * OC().smsKsh, { bucket:"cost", note:`${notices} messages` });
+  return L.sort((a, b) => b.ts - a.ts);
+}
+function viewOwner(){
+  const per = ui.oPeriod || "all", nowD = new Date(NOWMS());
+  const inPer = e => per === "all" ? true : (() => { const d = new Date(e.ts); return per === "month" ? d.getMonth() === nowD.getMonth() && d.getFullYear() === nowD.getFullYear() : d.getFullYear() === nowD.getFullYear(); })();
+  const all = ledger(), L = all.filter(inPer), sum = b => L.filter(e => e.bucket === b).reduce((t, e) => t + e.amount, 0);
+  const commission = sum("rev-commission"), escrowFees = sum("rev-escrow"), first = Math.min(...all.filter(e => e.ts).map(e => e.ts)), monthsLive = Math.max(1, Math.round((NOWMS() - first) / (30.4 * 86400000)) + 1),
+    hosting = per === "month" ? OC().hostingKsh : per === "year" ? OC().hostingKsh * (nowD.getMonth() + 1) : OC().hostingKsh * monthsLive;
+  const costs = sum("cost") + hosting, revenue = commission + escrowFees, net = revenue - costs;
+  const held = S.projects.reduce((t, p) => t + moneySummary(p).held, 0), owed = all.filter(e => e.bucket === "owed").reduce((t, e) => t + e.amount, 0);
+  const usd = k => `$${Math.round(k / 130).toLocaleString("en-US")}`;
+  const kpi = (v, t, sub, tone) => `<div class="sumcard ${tone || ""}"><strong>${money(v)}</strong><span>${t}</span><span class="tiny muted">${sub || usd(v)}</span></div>`;
+  // checks that the numbers add up
+  const funded = all.filter(e => e.bucket === "escrow-in").reduce((t, e) => t + e.amount, 0), out = all.filter(e => e.bucket === "escrow-out").reduce((t, e) => t + e.amount, 0);
+  const feesIn = all.filter(e => e.bucket === "fee-in").reduce((t, e) => t + e.amount, 0), comm = all.filter(e => e.bucket === "rev-commission").reduce((t, e) => t + e.amount, 0), paidOut = all.filter(e => e.bucket === "payout").reduce((t, e) => t + e.amount, 0);
+  const rels = []; S.projects.forEach(p => Object.entries(money0(p).releases).forEach(([mid, r]) => rels.push({ p, mid, r })));
+  const checks = [
+    [funded - out === held, `Escrow balances: ${money(funded)} received − ${money(out)} released = ${money(held)} held now`],
+    [feesIn === comm + paidOut + owed, `Visit fees balance: ${money(feesIn)} = ${money(comm)} commission + ${money(paidOut)} paid out + ${money(owed)} still owed`],
+    [rels.every(x => x.r.status !== "paid" || (x.r.approvals || []).length >= 2), "Every release was approved by two different people"],
+    [rels.every(x => isFunded(x.p, x.mid)), "Nothing was released that hadn’t been received"],
+    [S.visits.every(v => !v.payout || v.payout.status !== "paid" || v.status === "approved"), "Professionals were only paid for approved reports"],
+    [all.filter(e => e.bucket === "payout" || e.bucket === "escrow-out").every(e => e.ref), "Every payment out has a bank or M-Pesa reference"]];
+  // months
+  const months = Array.from({ length:6 }, (_, i) => { const d = new Date(nowD.getFullYear(), nowD.getMonth() - 5 + i, 1); return { y:d.getFullYear(), m:d.getMonth(), label:d.toLocaleDateString("en-GB", { month:"short" }) }; });
+  months.forEach(mo => { const inM = e => { const d = new Date(e.ts); return d.getFullYear() === mo.y && d.getMonth() === mo.m; };
+    mo.rev = all.filter(e => inM(e) && e.bucket.startsWith("rev")).reduce((t, e) => t + e.amount, 0); mo.cost = all.filter(e => inM(e) && e.bucket === "cost").reduce((t, e) => t + e.amount, 0) + OC().hostingKsh; });
+  const maxM = Math.max(1, ...months.map(x => Math.max(x.rev, x.cost)));
+  // breakdowns
+  const byType = Object.keys(TYPES).map(k => ({ k, v:L.filter(e => e.bucket.startsWith("rev") && e.p && ptype(e.p) === k).reduce((t, e) => t + e.amount, 0) }));
+  const proRows = Object.keys(VERIFIERS).map(id => { const vs = S.visits.filter(v => v.verifierId === id && v.status === "approved"); return { id, jobs:vs.length, earned:vs.reduce((t, v) => t + netOf(v), 0), comm:vs.reduce((t, v) => t + feeOf(v) - netOf(v), 0) }; }).filter(x => x.jobs).sort((a, b) => b.comm - a.comm).slice(0, 6);
+  const tabs = [["all","All time"],["year","This year"],["month","This month"]];
+  return `<h1 class="hello">Owner’s dashboard</h1>
+    <p class="hello-sub">Only you can see this. Money in, money out, what Macho earns, what it costs, and whether everything adds up.</p>
+    <div class="chips pick" style="margin-top:14px">${tabs.map(([k, t]) => `<button data-act="oPeriod" data-v="${k}" aria-pressed="${per === k}">${t}</button>`).join("")}</div>
+    <div class="sumcards">${kpi(net, "Macho net income", `${usd(net)} after estimated costs`, net >= 0 ? "" : "hot")}${kpi(commission, "Commission on visit fees", `30% of each fee, ${usd(commission)}`)}${kpi(escrowFees, "Escrow handling fees", `${ESCROW_FEE * 100}% of money released, ${usd(escrowFees)}`)}${kpi(costs, "Costs (estimated)", usd(costs))}</div>
+    <div class="sumcards">${kpi(held, "Client money in escrow now", "Held by the partner bank, never Macho’s")}${kpi(paidOut, "Paid to professionals (all time)", usd(paidOut))}${kpi(owed, "Owed to professionals", `Paid on ${nextPayDay()}`)}${kpi(out, "Released to contractors and sellers", usd(out))}</div>
+    <section class="card" style="margin-top:20px"><h2>${ic("shield",24)} Does everything add up?</h2>
+      <ul class="checks">${checks.map(([ok, t]) => `<li><span class="tick ${ok ? "" : "no"}">${ic(ok ? "check" : "cross",14)}</span><span>${t}${ok ? "" : " <strong>Look into this.</strong>"}</span></li>`).join("")}</ul></section>
+    <div class="ograd">
+      <section class="card"><h2>${ic("chart",24)} Last 6 months</h2>
+        <div class="mchart" role="img" aria-label="Revenue and costs for the last six months">${months.map(x => `<div class="mcol"><div class="mbars"><span class="mbar rev" style="height:${Math.round(100 * x.rev / maxM)}%" title="Revenue ${money(x.rev)}"></span><span class="mbar cost" style="height:${Math.round(100 * x.cost / maxM)}%" title="Costs ${money(x.cost)}"></span></div><span class="mlab">${x.label}</span><span class="tiny">${money(x.rev)}</span></div>`).join("")}</div>
+        <p class="small legendrow"><span class="key rev"></span> Revenue <span class="key cost"></span> Costs (estimated)</p></section>
+      <section class="card"><h2>${ic("stages",24)} Revenue by service</h2>
+        <ul class="rows">${byType.map(x => `<li><span>${ic(TYPES[x.k].icon,20)} ${TYPES[x.k].label}</span><strong>${money(x.v)}</strong></li>`).join("")}</ul>
+        <h3 class="modal-sub" style="font-size:1.1rem">Top professionals by commission</h3>
+        <ul class="rows">${proRows.map(x => `<li><span class="r-main">${avatar(x.id, 32)} ${VERIFIERS[x.id].name} <span class="tiny muted">${x.jobs} ${x.jobs === 1 ? "job" : "jobs"}</span></span><span class="small"><strong>${money(x.comm)}</strong> to Macho, ${money(x.earned)} to them</span></li>`).join("")}</ul></section>
+    </div>
+    <section class="card" style="margin-top:20px"><div class="req-head"><h2>${ic("doc",24)} Every money movement</h2><button class="btn ghost small-btn" data-act="ledgerCsv">${ic("download",18)} Download as CSV</button></div>
+      <div class="tablewrap"><table class="ptable"><thead><tr><th>Date</th><th>What</th><th>Project</th><th>Amount</th><th>Reference</th></tr></thead><tbody>
+      ${L.slice(0, ui.oAll ? 400 : 25).map(e => `<tr class="${e.bucket}"><td class="small">${esc(e.date)}</td><td>${e.kind}${e.note ? ` <span class="tiny muted">(${e.note})</span>` : ""}</td><td class="small">${e.p ? `${esc(e.p.name)}, ${esc(e.p.town)}${e.m ? `: ${e.m.short}` : ""}` : "–"}</td><td><strong>${e.bucket === "cost" ? "−" : ""}${money(e.amount)}</strong></td><td class="tiny">${esc(e.ref || "")}</td></tr>`).join("")}</tbody></table></div>
+      ${L.length > 25 && !ui.oAll ? `<div class="btn-row"><button class="btn ghost small-btn" data-act="oAll">Show all ${L.length}</button></div>` : ""}</section>
+    <section class="card" style="margin-top:20px"><h2>${ic("pencil",24)} Cost assumptions</h2><p class="small muted">Real costs come from your provider invoices once you’re live. Until then, these estimates are used.</p>
+      <div class="fields">${[["cardPct","Card and M-Pesa charge on visit fees (%)"],["payoutKsh","M-Pesa charge per payout (KSh)"],["smsKsh","Cost per text or WhatsApp message (KSh)"],["kycKsh","Cost per professional ID check (KSh)"],["hostingKsh","Hosting and tools per month (KSh)"]].map(([k, t]) => `<label class="field">${t}<input type="number" step="any" min="0" data-field="oc" data-k="${k}" value="${OC()[k]}"></label>`).join("")}</div></section>
+    <section class="card" style="margin-top:20px"><h2>${ic("help",24)} What to track next</h2>
+      <ul class="plain">
+        <li><strong>Take rate:</strong> Macho’s income as a share of all money flowing through. Watch it stay between 1.5% and 3%.</li>
+        <li><strong>Cost to win a client</strong> (marketing ÷ new clients) against <strong>what a client is worth</strong> (income from all their projects).</li>
+        <li><strong>Repeat clients:</strong> how many start a second project. The best sign of trust.</li>
+        <li><strong>Speed:</strong> hours from request to accepted, and from visit to approved report.</li>
+        <li><strong>Quality:</strong> disputes per 100 reports, and reports sent back first time.</li>
+        <li><strong>Cash:</strong> money in the bank and months of costs it covers.</li>
+        <li><strong>Money held:</strong> how long client money sits in escrow on average, and the largest single amount held.</li>
+      </ul></section>`;
 }
 
 /* ---------- Client: my projects ---------- */
@@ -3008,6 +3116,7 @@ function render(){
   const app = document.getElementById("app");
   if(signing){ app.innerHTML = viewSignIn(); renderModal(); return; }
   if(ui.role === "presenter"){ app.innerHTML = viewPresenter(); renderModal(); return; }
+  if(ui.role === "owner"){ app.innerHTML = (DEMO || (SESSION && SESSION.owner)) ? viewOwner() : `<p class="empty-msg">Only the owner can see this page.</p>`; renderModal(); return; }
   if(ui.role === "client"){ const p = ui.page === "project" && pById(ui.pid); app.innerHTML = ui.page === "reports" ? viewReports() : ui.page === "people" ? viewPeople() : ui.page === "messages" ? viewMessages() : ui.page === "help" ? viewHelp() : p ? viewProject(p) : viewHome(); }
   else app.innerHTML = ui.role === "verifier" ? viewVerifier() : viewReview();
   renderModal();
@@ -3074,6 +3183,7 @@ const actions = {
     if(inp) si.phone = inp.value.trim();
     const full = fullPhone(si.cc, si.phone), digits = full.replace(/\D/g, "").slice(si.cc.replace(/\D/g, "").length);
     if(digits.length < 7 || digits.length > 12){ if(err) err.textContent = "Please check the number. Leave out the first 0."; return; }
+    if(si.role === "owner" && !isOwner(full)){ if(err) err.textContent = "Only the owner’s number can open the owner’s dashboard."; return; }
     if(!isOwner(full)){
       const has = roleOfPhone(full);
       if(has && has !== si.role){ if(err) err.innerHTML = `This number is registered as ${ROLE_NAME[has]}. Each number can only be used for one kind of account. <button class="linkish" data-act="siSwitch" data-v="${has}">Sign in as ${ROLE_NAME[has]} instead</button>`; return; }
@@ -3115,6 +3225,12 @@ const actions = {
   freshLocal(){ S = seed(); save(); ui.page = "home"; toast("Fresh sample data loaded on this device."); render(); },
   newProject(d){ ui.modal = {kind:"newProject", type:(d && d.type) || "build"}; renderModal(); },
   hf(d){ ui.hf = d.v; render(); },
+  oPeriod(d){ ui.oPeriod = d.v; ui.oAll = false; render(); },
+  oAll(){ ui.oAll = true; keepScroll(render); },
+  ledgerCsv(){ const rows = [["Date","What","Project","Stage","Amount (KSh)","Reference"]].concat(ledger().map(e => [e.date, e.kind, e.p ? `${e.p.name}, ${e.p.town}` : "", e.m ? e.m.name : "", (e.bucket === "cost" ? -1 : 1) * e.amount, e.ref || ""]));
+    const csv = rows.map(r => r.map(x => `"${String(x).replace(/"/g, '""')}"`).join(",")).join("\n");
+    try{ const a = document.createElement("a"); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = "macho-money.csv"; document.body.appendChild(a); a.click(); a.remove(); toast("Saved macho-money.csv. (Inside Claude, downloads may be blocked: use your GitHub link.)"); }
+    catch(e){ toast("Download isn’t available here."); } },
   reports(){ ui.role = "client"; ui.page = "reports"; ui.modal = null; render(); window.scrollTo(0, 0); },
   dismissMsgs(d){ ui.dismissedMsgs = +d.v; keepScroll(render); },
   toggleClosed(){ ui.showClosed = !ui.showClosed; keepScroll(render); },
@@ -3345,6 +3461,7 @@ document.addEventListener("change", async e => {
   else if(f === "fixItem"){ const l = ui.modal.items, i = l.indexOf(t.value); if(t.checked && i < 0) l.push(t.value); if(!t.checked && i >= 0) l.splice(i, 1); renderModal(); }
   else if(f === "fixDue"){ ui.modal.due = +t.value; renderModal(); }
   else if(f === "fundVia"){ ui.modal.via = t.value; renderModal(); }
+  else if(f === "oc"){ const v = parseFloat(t.value); if(!isNaN(v) && v >= 0){ OC()[t.dataset.k] = v; save(); keepScroll(render); } }
   else if(f === "fFavs"){ ui.f.favs = t.value === "1"; render(); }
   else if(f === "proAlert"){ const sid = ui.signedIn, ed = (S.proEdits || (S.proEdits = {})), e = ed[sid] || (ed[sid] = {}); e.notify = Object.assign({ wa:proAlert(sid, "wa"), sms:proAlert(sid, "sms") }, e.notify || {}); e.notify[t.dataset.k] = t.checked; save(); toast(t.checked ? "Alerts on." : "Alerts off."); }
   else if(f === "phoneAlerts"){
@@ -3374,7 +3491,7 @@ document.addEventListener("change", async e => {
   else if(f === "bookDate"){ ui.modal.date = t.value; }
   else if(f === "bookTime"){ ui.modal.time = t.value; }
 });
-const HASH = { client:"client", verifier:"pro", review:"review", presenter:"demo" };
+const HASH = { client:"client", verifier:"pro", review:"review", presenter:"demo", owner:"owner" };
 function setHash(){ const h = needSignIn() ? "signin" : HASH[ui.role]; if(location.hash.slice(1) !== h){ try{ history.replaceState(null, "", "#" + h); }catch(e){ try{ location.hash = h; }catch(e2){} } } }
 function fromHash(){ const h = (location.hash || "").slice(1);
   if(h === "signin"){ if(!needSignIn()){ ui.forceSignIn = true; ui.si = null; render(); } return; }
